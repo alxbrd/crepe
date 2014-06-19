@@ -1,0 +1,6 @@
+var javaFitnessFunction = new Native('crepe.examples.tools.servicecomposition.ExampleTool');
+
+"tesssssssssssst".println();
+"tesssssssssssst".println();
+"tesssssssssssst".println();
+javaFitnessFunction.println();

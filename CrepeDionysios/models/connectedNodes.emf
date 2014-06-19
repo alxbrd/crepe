@@ -1,0 +1,20 @@
+// probably want a better URI at some point :-)
+@namespace(uri="http://www.eclipse.org/crepe_dionysios/2014/v1", prefix="connectedNodes")
+package connectedNodes;
+
+class Model {
+	val Node[*] nodes;
+	val Connection[*] connections;
+}
+
+class Node {
+	attr int ID;
+	attr int type;
+	attr int load;
+}
+
+class Connection {
+	attr int hops;
+	ref Node src;
+	ref Node tgt;
+}

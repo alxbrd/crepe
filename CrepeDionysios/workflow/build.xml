@@ -1,0 +1,41 @@
+<project name="Compute some sample surrogate function values">
+	<path id="epsilon-classpath"> 
+			<fileset dir="../../crepe.dependencies/lib/"> 
+				<include name="*.jar"/> 
+			</fileset>
+	</path>	
+	
+	<target name="main" depends="loadCSV1">
+		<!-- Load models -->	
+		<epsilon.emf.register file="models/connectedNodes.ecore"/>
+		<epsilon.emf.register file="models/OrchestrationMM.ecore"/>
+
+		<epsilon.emf.loadModel name="OUT"
+				 	modelFile="models/predictors.xmi"
+					metamodelFile="models/connectedNodes.ecore" />
+				
+		<epsilon.emf.loadModel name="OrchestrationMM"
+		 	modelFile="models/configuration1.xmi"
+			metamodelFile="models/OrchestrationMM.ecore" />
+		
+		<!-- Run Surrogate Evaluation -->
+		<epsilon.eol src="transformations/SurrogateFunction.eol" taskname="Evaluate">
+			<model ref="OUT" />
+			<model ref="OrchestrationMM" />
+		</epsilon.eol>
+	</target>
+	
+	<target name="loadCSV1" depends="loadCSV2">
+		<epsilon.loadModel name="HOPS" type="CSV">
+			<parameter name="file" value="${basedir}/files/hops.csv"/>
+			<parameter name="readOnLoad" value="true"/>
+		</epsilon.loadModel>
+	</target>
+	
+	<target name="loadCSV2">
+		<epsilon.loadModel name="NODES" type="CSV">
+			<parameter name="file" value="${basedir}/files/scenarioConfiguration.csv"/>
+			<parameter name="readOnLoad" value="true"/>
+		</epsilon.loadModel>
+	</target>
+</project>

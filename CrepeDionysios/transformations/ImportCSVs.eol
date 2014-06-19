@@ -1,0 +1,43 @@
+/*
+  Import the two CSV files generated from the simulator and produce an instance of connected Nodes.
+
+  Params:
+
+  HOPS  -- CSV file specifying the hops between nodes
+  NODES -- CSV file specifying the type and load of nodes
+  OUT   -- instance of connectedNodes produced by the transformation
+*/
+
+var m : OUT!Model := new OUT!Model;
+
+for (sNode in NODES!Row.all()) { 
+  // Ignore first line
+  if ( sNode.at(0) == "id") {
+  	// do nothing
+  } else {
+    var tNode := new OUT!Node;
+  	tNode.ID = sNode.at(0).asInteger();
+  	tNode.type = sNode.at(1).asInteger();
+  	tNode.load = sNode.at(2).asInteger();
+  
+  	m.nodes->add (tNode);
+  }
+}
+
+for (sCon in HOPS!Row.all()) { 
+  // Ignore first line
+  if ( sCon.at(0) == "source") {
+  	// do nothing
+  } else {
+    var outCon := new OUT!Connection;
+    outCon.src = lookupNode(sCon.at(0).asInteger());
+    outCon.tgt = lookupNode(sCon.at(1).asInteger());
+    outCon.hops = sCon.at(2).asInteger();
+  
+    m.connections->add (outCon);
+  }
+}
+
+operation  lookupNode (nID : Integer) : OUT!Node {
+  return OUT!Node.all->selectOne (n | n.ID = nID);
+}
