@@ -17,7 +17,6 @@ import utils.FilesUtils;
 import utils.PredictorsTuple;
 
 public class ExampleTool {
-
 	// The R engine which creates an interface between R and Java.
 	private Rengine re;
 	// Names of predictors variables
