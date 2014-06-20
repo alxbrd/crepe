@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/crepe.examples.tools.servicecomposition/src/crepe/examples/tools/servicecomposition/ExampleTool.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="R_HOME" value="/usr/lib/R"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="crepe.examples.tools.servicecomposition.ExampleTool"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="crepe.examples.tools.servicecomposition"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=.:/usr/lib/R/site-library/rJava/jri/"/>
+</launchConfiguration>

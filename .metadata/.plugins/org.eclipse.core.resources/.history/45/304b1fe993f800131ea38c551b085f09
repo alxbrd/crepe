@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project name="Testing an example" default="main" basedir=".">
+	<!--<property name="lib.dir" location="lib" />
+
+	<path id="build.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="main">
+		<epsilon.eol src="${basedir}/transformations/test.eol">
+		</epsilon.eol>
+		<classpath refid="build.classpath" />
+	</target>
+</project>
