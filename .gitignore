@@ -1,0 +1,9 @@
+# History files
+.Rhistory
+
+# R data files from past sessions
+.Rdata
+
+# Backup files
+*~
+
