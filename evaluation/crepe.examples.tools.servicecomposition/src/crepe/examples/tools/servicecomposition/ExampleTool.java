@@ -35,7 +35,8 @@ public class ExampleTool {
 	 * @param values
 	 * @return
 	 */
-	public double[] evaluate(int[] values) {
+	public double evaluate(int value) {
+		int[] values = { 1, 22, 2, 3, 2, 3, 4, 6, 3 };
 		loadModel(model);
 
 		// Populate the predictors of an example composition configuration
@@ -46,7 +47,7 @@ public class ExampleTool {
 		for (int i = 1; i <= objectives; i++)
 			System.out.println("Objective " + i + " : " + predictData(pred, i));
 
-		return results;
+		return results[0];
 	}
 
 	/**
@@ -118,6 +119,6 @@ public class ExampleTool {
 	public static void main(String[] args) {
 		int[] values = { 1, 22, 2, 3, 2, 3, 4, 6, 3 };
 		ExampleTool tool = new ExampleTool();
-		tool.evaluate(values);
+		tool.evaluate(1);
 	}
 }

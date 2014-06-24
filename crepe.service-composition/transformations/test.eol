@@ -1,0 +1,4 @@
+// Example of calling out to a Java class to evaluate the fitness
+var javaFitnessFunction = new Native('crepe.examples.tools.servicecomposition.ExampleTool');
+var javaFitness = javaFitnessFunction.evaluate(1);
+javaFitness.println();
