@@ -13,3 +13,6 @@ RemoteSystemsTempFiles/
 # Backup files
 *~
 
+org.eclipse.epsilon.examples.tools/
+
+

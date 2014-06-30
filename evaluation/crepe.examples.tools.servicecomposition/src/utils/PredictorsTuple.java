@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The <code>PredictorsTuple</code> class is used for storing the values for the various predictor variables of a
@@ -12,11 +13,11 @@ import java.util.ArrayList;
 public class PredictorsTuple {
 	private ArrayList<PredictorVariable> variables;
 
-	public PredictorsTuple(String[] predictorNames, int[] values) {
+	public PredictorsTuple(String[] predictorNames, List<Integer> values) {
 		variables = new ArrayList<PredictorVariable>();
 
 		for (int i = 0; i < predictorNames.length; i++) {
-			variables.add(new PredictorVariable(predictorNames[i], values[i]));
+			variables.add(new PredictorVariable(predictorNames[i], values.get(i)));
 		}
 	}
 

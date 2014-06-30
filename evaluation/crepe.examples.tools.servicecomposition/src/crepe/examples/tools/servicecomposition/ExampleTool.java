@@ -4,11 +4,14 @@ package crepe.examples.tools.servicecomposition;
  * Before running this file you must follow the following steps:
  * 1. Install rJava - by the following command in R install.packages('rJava')
  * 2. Add "-Djava.library.path=.:/usr/lib/R/site-library/rJava/jri/" into the VM arguments of the running configuration 
- * 3. Create an environmental variable R_HOME which contains the lib of the local R installation (/usr/lib/R)
+ * 3. Create an environmental variable R_HOME which contains the lib of the local R installation (/usr/lib/R) in /etc/environment (Linux)
  * 4. Install all the R libraries which are necessary for running the models (foreach, leaps, earth, DAAG, caret, e1071, rpart, languageR, randomForest, MASS, party)
  */
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
@@ -35,8 +38,7 @@ public class ExampleTool {
 	 * @param values
 	 * @return
 	 */
-	public double evaluate(int value) {
-		int[] values = { 1, 22, 2, 3, 2, 3, 4, 6, 3 };
+	public double evaluate(List<Integer> values) {
 		loadModel(model);
 
 		// Populate the predictors of an example composition configuration
@@ -55,6 +57,24 @@ public class ExampleTool {
 	 * 
 	 */
 	public void loadModel(String modelName) {
+		/**
+		 * Set the VM argument for accessing the JRI which connects Java with R
+		 */
+		System.setProperty("java.library.path", ".:/usr/lib/R/site-library/rJava/jri/");
+		Field fieldSysPath;
+		try {
+			fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+			fieldSysPath.setAccessible(true);
+			fieldSysPath.set(null, null);
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 
 		re = new Rengine(new String[] { "--vanilla" }, false, null);
 
@@ -116,9 +136,18 @@ public class ExampleTool {
 		re.end();
 	}
 
-	public static void main(String[] args) {
-		int[] values = { 1, 22, 2, 3, 2, 3, 4, 6, 3 };
+	public static void main(String[] args) throws IOException {
+		List<Integer> values = new ArrayList<Integer>();
+		values.add(1);
+		values.add(22);
+		values.add(2);
+		values.add(3);
+		values.add(2);
+		values.add(3);
+		values.add(4);
+		values.add(6);
+		values.add(3);
 		ExampleTool tool = new ExampleTool();
-		tool.evaluate(1);
+		tool.evaluate(values);
 	}
 }

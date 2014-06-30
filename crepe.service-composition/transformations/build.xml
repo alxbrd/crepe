@@ -1,18 +1,16 @@
 <?xml version="1.0"?>
-<project name="crepe.examples.tsp">
-
+<project name="crepe.examples.tsp" default="main">
 	<!-- load Epsilon tasks -->
-	<path id="epsilon-classpath"> 
-		<fileset dir="lib/"> 
-			<include name="*.jar"/> 
+	<path id="epsilon-classpath">
+		<fileset dir="../lib/">
+			<include name="*.jar" />
 		</fileset>
 	</path>
-	
+	<taskdef resource="org/eclipse/epsilon/workflow/tasks/epsilontasks.xml" classpathref="epsilon-classpath" loaderref="epsilon-classpath.loader" />
+	<taskdef resource="org/eclipse/epsilon/workflow/tasks/emf/epsilonemftasks.xml" classpathref="epsilon-classpath" loaderref="epsilon-classpath.loader" />
 	<target name="main">
-		
 		<!-- Run experiment -->
-		<epsilon.eol src="transformations/test.eol" taskname="TEST">
+		<epsilon.eol src="test.eol" taskname="TEST">
 		</epsilon.eol>
 	</target>
-	
 </project>
