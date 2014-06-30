@@ -38,18 +38,20 @@ public class ExampleTool {
 	 * @param values
 	 * @return
 	 */
-	public double evaluate(List<Integer> values) {
+	public List<Double> evaluate(List<Integer> values) {
 		loadModel(model);
 
 		// Populate the predictors of an example composition configuration
 		PredictorsTuple pred = new PredictorsTuple(predictors, values);
 
-		double[] results = new double[objectives];
+		List<Double> results = new ArrayList<Double>();
 
-		for (int i = 1; i <= objectives; i++)
-			System.out.println("Objective " + i + " : " + predictData(pred, i));
+		for (int i = 1; i <= objectives; i++) {
+			results.add(predictData(pred, i));
+			System.out.println("Objective " + i + " : " + results.get(i - 1));
+		}
 
-		return results[0];
+		return results;
 	}
 
 	/**
@@ -82,6 +84,9 @@ public class ExampleTool {
 			System.out.println("Cannot load R");
 			return;
 		}
+
+		String workingDir = System.getProperty("user.dir");
+		System.out.println("Current working directory : " + workingDir);
 
 		try {
 			// Store the R model code into a temporary file
