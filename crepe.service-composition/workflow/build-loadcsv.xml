@@ -1,46 +1,34 @@
-<project name="Compute some sample surrogate function values" basedir="..">
-	<!-- load Epsilon tasks -->
-	<path id="epsilon-classpath">
-		<fileset dir="${basedir}/lib/">
-			<include name="*.jar" />
-		</fileset>
-	</path>
-	<taskdef resource="org/eclipse/epsilon/workflow/tasks/epsilontasks.xml" 
-		     classpathref="epsilon-classpath" 
-		     loaderref="epsilon-classpath.loader" />
-	<taskdef resource="org/eclipse/epsilon/workflow/tasks/emf/epsilonemftasks.xml" 
-		     classpathref="epsilon-classpath" 
-		     loaderref="epsilon-classpath.loader" />
+<?xml version="1.0"?>
+<project name="Load simulation state from CSV files" basedir="..">
 	
 	<target name="main" depends="loadCSV1">
 		<!-- Load models -->
 		<epsilon.emf.loadModel name="OUT"
 				 	modelFile="${basedir}/models/predictors.xmi"
-					metamodelFile="${basedir}/models/connectedNodes.ecore" />
-				
-		<epsilon.emf.loadModel name="OrchestrationMM"
-		 	modelFile="${basedir}/models/configuration1.xmi"
-			metamodelFile="${basedir}/models/OrchestrationMM.ecore" />
+					metamodelFile="${basedir}/models/connectedNodes.ecore" 
+					read="false"/>
 		
 		<!-- Run Surrogate Evaluation -->
-		<epsilon.eol src="${basedir}/transformations/importCSV.eol">
+		<epsilon.eol src="${basedir}/transformations/ImportCSVs.eol">
 			<model ref="HOPS" />
 			<model ref="NODES" />
 			<model ref="OUT" />
 		</epsilon.eol>
+		
+		<epsilon.disposeModels/>
 	</target>
 	
 	<target name="loadCSV1" depends="loadCSV2">
-		<epsilon.loadmodel name="HOPS" type="CSV">
+		<epsilon.loadModel name="HOPS" type="CSV">
 			<parameter name="file" value="${basedir}/files/hops.csv"/>
 			<parameter name="readOnLoad" value="true"/>
-		</epsilon.loadmodel>
+		</epsilon.loadModel>
 	</target>
 	
 	<target name="loadCSV2">
-		<epsilon.loadmodel name="NODES" type="CSV">
+		<epsilon.loadModel name="NODES" type="CSV">
 			<parameter name="file" value="${basedir}/files/scenarioConfiguration.csv"/>
 			<parameter name="readOnLoad" value="true"/>
-		</epsilon.loadmodel>
+		</epsilon.loadModel>
 	</target>
 </project>

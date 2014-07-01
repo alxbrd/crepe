@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project name="Compute some sample surrogate function values" basedir="..">
 	<!-- load Epsilon tasks -->
 	<path id="epsilon-classpath">
@@ -11,6 +12,7 @@
 	<taskdef resource="org/eclipse/epsilon/workflow/tasks/emf/epsilonemftasks.xml" 
 		     classpathref="epsilon-classpath" 
 		     loaderref="epsilon-classpath.loader" />
+		     	
 	<target name="main">
 		<!-- Load models -->	
 		<epsilon.emf.register file="${basedir}/models/connectedNodes.ecore"/>
