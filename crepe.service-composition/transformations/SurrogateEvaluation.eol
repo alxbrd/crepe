@@ -1,0 +1,167 @@
+/*
+  Calculate the linear regression surrogate fitness functions for a concrete service composition plan.
+
+  Params:
+
+  OrchestrationMM  -- instance of a service composition configuration which conforms to OrchestrationMM
+  OUT   -- instance of connectedNodes produced by the transformation
+*/
+
+// Get the root element from the Predictors Metamodel
+var pred : OUT!Model := new OUT!Model;
+
+// Get the root element from the Service Composition Metamodel
+var m = new OrchestrationMM!CompositeApplication;
+// Get one concrete plan
+var concretePlan = new OrchestrationMM!ConcretePlan;
+concretePlan = OrchestrationMM!ConcretePlan.allInstances.first();
+
+calculateSurrogate(concretePlan);
+
+/**
+ * Calculates the Linear Regression fitness function for an input service composition configuration.
+ */
+operation calculateSurrogate(concretePlan : OrchestrationMM!ConcretePlan){
+ 
+  var predictors = calculatePredictors(concretePlan);
+  printConfiguration(predictors);
+
+  // Example of calling out to a Java class to evaluate the fitness
+  var javaFitnessFunction = new Native('crepe.examples.tools.servicecomposition.ExampleTool');
+  var myInts : Sequence = getValues(predictors);
+  var result : Sequence = javaFitnessFunction.evaluate(myInts);
+
+  ("Response Time: " + result.get(0)).println();
+  ("Service Reliability: " + result.get(1)).println();
+  ("Energy Consumption: " + result.get(2)).println();
+}
+
+operation getValues(predictors : Map) : Sequence {
+    var values : Sequence = Sequence {
+    1, // ID - Always set to 1
+    predictors.get("orchestrators"),
+    predictors.get("hops"),
+    predictors.get("devFast"),
+    predictors.get("devMedium"),
+    predictors.get("devSlow"),
+    predictors.get("loadBig"),
+    predictors.get("loadMedium"),
+    predictors.get("loadSmall")
+    };
+    
+    return values;
+}
+
+/**
+ * Calculates the predictor variable values of interest for an input service composition configuration.
+ * Returns a map containing the values of eight predictor variables.
+ */
+operation calculatePredictors(concretePlan : OrchestrationMM!ConcretePlan) : Map {
+  var predictors = new Map;
+
+  predictors.put("orchestrators", OrchestrationMM!Orchestrator.allInstances.size());
+  predictors.put("hops", calculateHops(concretePlan));
+  predictors.put("devFast", countTypeNodes(1, concretePlan));
+  predictors.put("devMedium", countTypeNodes(2, concretePlan));
+  predictors.put("devSlow", countTypeNodes(3, concretePlan));
+  predictors.put("loadBig", countLoadNodes(1, concretePlan));
+  predictors.put("loadMedium", countLoadNodes(2, concretePlan));
+  predictors.put("loadSmall", countLoadNodes(3, concretePlan));
+
+  return predictors;
+}
+
+/**
+ * Prints a pretty output for an input service composition configuration.
+ */
+operation printConfiguration(predictors : Map) {
+  ("The Service Composition Configuration with: \n\t" +
+	"Orchestrators: " + predictors.get("orchestrators") + "\n\t" + 
+   	"Total Hops: " + predictors.get("hops") + "\n\t" + 
+  	"Fast Nodes: " + predictors.get("devFast") + "\n\t" +
+  	"Medium Nodes: " + predictors.get("devMedium") + "\n\t" +
+  	"Slow Nodes: " + predictors.get("devSlow") + "\n\t" +
+  	"Highly Loaded Nodes: " + predictors.get("loadBig") + "\n\t" +
+  	"Medium Loaded Nodes: " + predictors.get("loadMedium") + "\n\t" +
+  	"Low Loaded Nodes: " + predictors.get("loadSmall") + "\n\t").println();
+}
+
+/**
+ * Calculates the total number of hops between the nodes within a service composition configuration.
+ * Returns the total number of hops between a pair of nodes.
+ */
+operation calculateHops(concretePlan : OrchestrationMM!ConcretePlan) : Integer {
+  var sum : Integer = 0;
+
+  for (orchestrator in concretePlan.orchestrators) { 
+    for (concreteService in orchestrator.concreteServices) { 
+	  sum = sum + lookupConnection(orchestrator.deployedOn.ID, concreteService.providedBy.ID);
+	}
+  }
+  
+  return sum;
+}
+
+/**
+ * Counts the various types of nodes within a service composition configuration.
+ * Returns the number of nodes with of the specific type.
+ */
+operation countTypeNodes (type : Integer, concretePlan : OrchestrationMM!ConcretePlan) : Integer {
+  var counter : Integer = 0;
+  
+  for (orchestrator in concretePlan.orchestrators) { 
+	if (lookupNode(orchestrator.deployedOn.ID).type == type)
+	  counter = counter + 1;
+	  
+	for (concreteService in orchestrator.concreteServices) { 
+	  var sNode = lookupNode(concreteService.providedBy.ID);
+	  
+	  if (sNode.type == type)
+	    counter = counter + 1;
+	}
+  }
+  
+  return counter;
+}
+
+/**
+ * Counts the various types of loaded nodes within a service composition configuration.
+ * Returns the number of nodes that have the specific load.
+ */
+operation countLoadNodes (load : Integer, concretePlan : OrchestrationMM!ConcretePlan) : Integer {
+  var counter : Integer = 0;
+  
+  for (orchestrator in concretePlan.orchestrators) { 
+	if (lookupNode(orchestrator.deployedOn.ID).load == load)
+	  counter = counter + 1;
+	  
+	for (concreteService in orchestrator.concreteServices) { 
+	  var sNode = lookupNode(concreteService.providedBy.ID);
+	  
+	  if (sNode.load == load)
+	    counter = counter + 1;
+	}
+  }
+  
+  return counter;
+}
+
+/**
+ * Finds the Node with a specific ID.
+ */
+operation lookupNode (nID : Integer) : OUT!Node {
+  return OUT!Node.all->selectOne (n | n.ID = nID);
+}
+
+/**
+ * Finds the Connection between a pair of source and target nodes.
+ */
+operation lookupConnection (nID_src : Integer, nID_tgt : Integer) : Integer {
+  if (nID_src == nID_tgt)
+    return 0; 
+  else {
+  	// The distance is indifferent to which of the node in the pair is identified as source or target in the connection link
+    return (OUT!Connection.all->selectOne (con | (con.src = lookupNode(nID_src) and con.tgt = lookupNode(nID_tgt)) 
+								  or (con.src = lookupNode(nID_tgt) and con.tgt = lookupNode(nID_src)))).hops;
+  }
+}

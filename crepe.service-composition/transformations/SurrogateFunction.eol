@@ -3,8 +3,8 @@
 
   Params:
 
-  OrchestrationMM  -- instance of a service composition configuration which conforms to OrchestrationMM
-  OUT   -- instance of connectedNodes produced by the transformation
+  OrchestrationMM -- instance of a service composition configuration which conforms to OrchestrationMM
+  OUT -- instance of connectedNodes produced by the transformation
 */
 
 // Get the root element from the Predictors Metamodel
@@ -25,33 +25,33 @@ operation calculateLinearModel(concretePlan : OrchestrationMM!ConcretePlan){
   
   var predictors = calculatePredictors(concretePlan);
   printConfiguration(predictors);
-			
+
   ("Response Time: " + calculateRT(predictors)).println();
   ("Service Reliability: " + calculateSR(predictors)).println();
   ("Energy Consumption: " + calculateNGR(predictors)).println();
 }
 
 operation calculateRT(predictors : Map) : Real {
-  return 99.290 + (-21.283) * predictors.get("orchestrators") 
-				 + (-0.371) * predictors.get("devMedium") 
-				 + 2.709 * predictors.get("devSlow") 
-				 + (-3.076) * predictors.get("loadSmall") 
-				 +  2.728 * predictors.get("loadBig");
+  return 99.290 + (-21.283) * predictors.get("orchestrators")
++ (-0.371) * predictors.get("devMedium")
++ 2.709 * predictors.get("devSlow")
++ (-3.076) * predictors.get("loadSmall")
++ 2.728 * predictors.get("loadBig");
 }
 
 operation calculateSR(predictors : Map) : Real {
-  return 30.6984 + 9.5975 * predictors.get("hops") 
-  				  + 8.1079 * predictors.get("orchestrators") 
-				  + 0.1916 * predictors.get("devMedium") 
-				  + (-0.6872) * predictors.get("devSlow") 
-				  + 0.2603 * predictors.get("loadMedium"); 
+  return 30.6984 + 9.5975 * predictors.get("hops")
+   + 8.1079 * predictors.get("orchestrators")
++ 0.1916 * predictors.get("devMedium")
++ (-0.6872) * predictors.get("devSlow")
++ 0.2603 * predictors.get("loadMedium");
 }
 
 operation calculateNGR(predictors : Map) : Real {
-  return 0.397561 + 0.049586 * predictors.get("hops") 
-    			   + 0.043738 * predictors.get("orchestrators") 
-    			   + (-0.005079) * predictors.get("devFast") 
-    			   + 0.002474 * predictors.get("devMedium");
+  return 0.397561 + 0.049586 * predictors.get("hops")
+     + 0.043738 * predictors.get("orchestrators")
+     + (-0.005079) * predictors.get("devFast")
+     + 0.002474 * predictors.get("devMedium");
 }
 
 /**
@@ -78,14 +78,14 @@ operation calculatePredictors(concretePlan : OrchestrationMM!ConcretePlan) : Map
  */
 operation printConfiguration(predictors : Map) {
   ("The Service Composition Configuration with: \n\t" +
-	"Orchestrators: " + predictors.get("orchestrators") + "\n\t" + 
-   	"Total Hops: " + predictors.get("hops") + "\n\t" + 
-  	"Fast Nodes: " + predictors.get("devFast") + "\n\t" +
-  	"Medium Nodes: " + predictors.get("devMedium") + "\n\t" +
-  	"Slow Nodes: " + predictors.get("devSlow") + "\n\t" +
-  	"Highly Loaded Nodes: " + predictors.get("loadBig") + "\n\t" +
-  	"Medium Loaded Nodes: " + predictors.get("loadMedium") + "\n\t" +
-  	"Low Loaded Nodes: " + predictors.get("loadSmall") + "\n\t").println();
+"Orchestrators: " + predictors.get("orchestrators") + "\n\t" +
+    "Total Hops: " + predictors.get("hops") + "\n\t" +
+   "Fast Nodes: " + predictors.get("devFast") + "\n\t" +
+   "Medium Nodes: " + predictors.get("devMedium") + "\n\t" +
+   "Slow Nodes: " + predictors.get("devSlow") + "\n\t" +
+   "Highly Loaded Nodes: " + predictors.get("loadBig") + "\n\t" +
+   "Medium Loaded Nodes: " + predictors.get("loadMedium") + "\n\t" +
+   "Low Loaded Nodes: " + predictors.get("loadSmall") + "\n\t").println();
 }
 
 /**
@@ -95,10 +95,10 @@ operation printConfiguration(predictors : Map) {
 operation calculateHops(concretePlan : OrchestrationMM!ConcretePlan) : Integer {
   var sum : Integer = 0;
 
-  for (orchestrator in concretePlan.orchestrators) { 
-    for (concreteService in orchestrator.concreteServices) { 
-	  sum = sum + lookupConnection(orchestrator.deployedOn.ID, concreteService.providedBy.ID);
-	}
+  for (orchestrator in concretePlan.orchestrators) {
+    for (concreteService in orchestrator.concreteServices) {
+sum = sum + lookupConnection(orchestrator.deployedOn.ID, concreteService.providedBy.ID);
+}
   }
   
   return sum;
@@ -111,16 +111,16 @@ operation calculateHops(concretePlan : OrchestrationMM!ConcretePlan) : Integer {
 operation countTypeNodes (type : Integer, concretePlan : OrchestrationMM!ConcretePlan) : Integer {
   var counter : Integer = 0;
   
-  for (orchestrator in concretePlan.orchestrators) { 
-	if (lookupNode(orchestrator.deployedOn.ID).type == type)
-	  counter = counter + 1;
-	  
-	for (concreteService in orchestrator.concreteServices) { 
-	  var sNode = lookupNode(concreteService.providedBy.ID);
-	  
-	  if (sNode.type == type)
-	    counter = counter + 1;
-	}
+  for (orchestrator in concretePlan.orchestrators) {
+if (lookupNode(orchestrator.deployedOn.ID).type == type)
+counter = counter + 1;
+
+for (concreteService in orchestrator.concreteServices) {
+var sNode = lookupNode(concreteService.providedBy.ID);
+
+if (sNode.type == type)
+counter = counter + 1;
+}
   }
   
   return counter;
@@ -133,16 +133,16 @@ operation countTypeNodes (type : Integer, concretePlan : OrchestrationMM!Concret
 operation countLoadNodes (load : Integer, concretePlan : OrchestrationMM!ConcretePlan) : Integer {
   var counter : Integer = 0;
   
-  for (orchestrator in concretePlan.orchestrators) { 
-	if (lookupNode(orchestrator.deployedOn.ID).load == load)
-	  counter = counter + 1;
-	  
-	for (concreteService in orchestrator.concreteServices) { 
-	  var sNode = lookupNode(concreteService.providedBy.ID);
-	  
-	  if (sNode.load == load)
-	    counter = counter + 1;
-	}
+  for (orchestrator in concretePlan.orchestrators) {
+if (lookupNode(orchestrator.deployedOn.ID).load == load)
+counter = counter + 1;
+
+for (concreteService in orchestrator.concreteServices) {
+var sNode = lookupNode(concreteService.providedBy.ID);
+
+if (sNode.load == load)
+counter = counter + 1;
+}
   }
   
   return counter;
@@ -160,10 +160,10 @@ operation lookupNode (nID : Integer) : OUT!Node {
  */
 operation lookupConnection (nID_src : Integer, nID_tgt : Integer) : Integer {
   if (nID_src == nID_tgt)
-    return 0; 
+    return 0;
   else {
-  	// The distance is indifferent to which of the node in the pair is identified as source or target in the connection link
-    return (OUT!Connection.all->selectOne (con | (con.src = lookupNode(nID_src) and con.tgt = lookupNode(nID_tgt)) 
-								  or (con.src = lookupNode(nID_tgt) and con.tgt = lookupNode(nID_src)))).hops;
+   // The distance is indifferent to which of the node in the pair is identified as source or target in the connection link
+    return (OUT!Connection.all->selectOne (con | (con.src = lookupNode(nID_src) and con.tgt = lookupNode(nID_tgt))
+or (con.src = lookupNode(nID_tgt) and con.tgt = lookupNode(nID_src)))).hops;
   }
 }

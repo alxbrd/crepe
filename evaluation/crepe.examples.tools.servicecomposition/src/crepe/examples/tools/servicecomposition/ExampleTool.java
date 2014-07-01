@@ -48,7 +48,7 @@ public class ExampleTool {
 
 		for (int i = 1; i <= objectives; i++) {
 			results.add(predictData(pred, i));
-			System.out.println("Objective " + i + " : " + results.get(i - 1));
+			// System.out.println("Objective " + i + " : " + results.get(i - 1));
 		}
 
 		return results;
@@ -84,9 +84,6 @@ public class ExampleTool {
 			System.out.println("Cannot load R");
 			return;
 		}
-
-		String workingDir = System.getProperty("user.dir");
-		System.out.println("Current working directory : " + workingDir);
 
 		try {
 			// Store the R model code into a temporary file

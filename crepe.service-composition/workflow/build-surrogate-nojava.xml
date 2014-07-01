@@ -1,0 +1,33 @@
+<project name="Compute some sample surrogate function values" basedir="..">
+	<!-- load Epsilon tasks -->
+	<path id="epsilon-classpath">
+		<fileset dir="${basedir}/lib/">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<taskdef resource="org/eclipse/epsilon/workflow/tasks/epsilontasks.xml" 
+		     classpathref="epsilon-classpath" 
+		     loaderref="epsilon-classpath.loader" />
+	<taskdef resource="org/eclipse/epsilon/workflow/tasks/emf/epsilonemftasks.xml" 
+		     classpathref="epsilon-classpath" 
+		     loaderref="epsilon-classpath.loader" />
+	<target name="main">
+		<!-- Load models -->	
+		<epsilon.emf.register file="${basedir}/models/connectedNodes.ecore"/>
+		<epsilon.emf.register file="${basedir}/models/OrchestrationMM.ecore"/>
+
+		<epsilon.emf.loadModel name="OUT"
+				 	modelFile="${basedir}/models/predictors.xmi"
+					metamodelFile="${basedir}/models/connectedNodes.ecore" />
+				
+		<epsilon.emf.loadModel name="OrchestrationMM"
+		 	modelFile="${basedir}/models/configuration1.xmi"
+			metamodelFile="${basedir}/models/OrchestrationMM.ecore" />
+		
+		<!-- Run Surrogate Evaluation -->
+		<epsilon.eol src="${basedir}/transformations/SurrogateFunction.eol">
+			<model ref="OUT" />
+			<model ref="OrchestrationMM" />
+		</epsilon.eol>
+	</target>
+</project>

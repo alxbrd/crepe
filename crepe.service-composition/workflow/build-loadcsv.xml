@@ -1,0 +1,46 @@
+<project name="Compute some sample surrogate function values" basedir="..">
+	<!-- load Epsilon tasks -->
+	<path id="epsilon-classpath">
+		<fileset dir="${basedir}/lib/">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<taskdef resource="org/eclipse/epsilon/workflow/tasks/epsilontasks.xml" 
+		     classpathref="epsilon-classpath" 
+		     loaderref="epsilon-classpath.loader" />
+	<taskdef resource="org/eclipse/epsilon/workflow/tasks/emf/epsilonemftasks.xml" 
+		     classpathref="epsilon-classpath" 
+		     loaderref="epsilon-classpath.loader" />
+	
+	<target name="main" depends="loadCSV1">
+		<!-- Load models -->
+		<epsilon.emf.loadModel name="OUT"
+				 	modelFile="${basedir}/models/predictors.xmi"
+					metamodelFile="${basedir}/models/connectedNodes.ecore" />
+				
+		<epsilon.emf.loadModel name="OrchestrationMM"
+		 	modelFile="${basedir}/models/configuration1.xmi"
+			metamodelFile="${basedir}/models/OrchestrationMM.ecore" />
+		
+		<!-- Run Surrogate Evaluation -->
+		<epsilon.eol src="${basedir}/transformations/importCSV.eol">
+			<model ref="HOPS" />
+			<model ref="NODES" />
+			<model ref="OUT" />
+		</epsilon.eol>
+	</target>
+	
+	<target name="loadCSV1" depends="loadCSV2">
+		<epsilon.loadmodel name="HOPS" type="CSV">
+			<parameter name="file" value="${basedir}/files/hops.csv"/>
+			<parameter name="readOnLoad" value="true"/>
+		</epsilon.loadmodel>
+	</target>
+	
+	<target name="loadCSV2">
+		<epsilon.loadmodel name="NODES" type="CSV">
+			<parameter name="file" value="${basedir}/files/scenarioConfiguration.csv"/>
+			<parameter name="readOnLoad" value="true"/>
+		</epsilon.loadmodel>
+	</target>
+</project>

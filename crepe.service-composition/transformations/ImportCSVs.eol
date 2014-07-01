@@ -10,6 +10,8 @@
 
 var m : OUT!Model := new OUT!Model;
 
+"Start reading the 2 csv files containing the simulation state.".println();
+
 for (sNode in NODES!Row.all()) { 
   // Ignore first line
   if ( sNode.at(0) == "id") {
@@ -21,8 +23,11 @@ for (sNode in NODES!Row.all()) {
   	tNode.load = sNode.at(2).asInteger();
   
   	m.nodes->add (tNode);
+    // tNode.println();
   }
 }
+
+"1 out of 2 - Finished reading the csv file for the network nodes.".println();
 
 for (sCon in HOPS!Row.all()) { 
   // Ignore first line
@@ -35,8 +40,11 @@ for (sCon in HOPS!Row.all()) {
     outCon.hops = sCon.at(2).asInteger();
   
     m.connections->add (outCon);
+    // outCon.println();
   }
 }
+
+"2 out of 2 - Finished reading the csv file for the communication links between network nodes.".println();
 
 operation  lookupNode (nID : Integer) : OUT!Node {
   return OUT!Node.all->selectOne (n | n.ID = nID);
