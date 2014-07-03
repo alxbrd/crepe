@@ -65,7 +65,7 @@ operation commence() {
 	}
 	
 	// Output the Pareto approximation set into a .csv file for post-processing
-	var file := new Native("java.io.File")("../ParetoNSGAII:Iter=" + 1 + ".csv"); // TODO add number of current experiment
+	var file := new Native("java.io.File")("../ParetoNSGAII:Iter=" + run + ".csv"); // TODO add number of current experiment
 	var fileWriter := new Native('java.io.PrintWriter')(file);
 	
 	var res = pareto.collect(ind | ind.objectives.score);

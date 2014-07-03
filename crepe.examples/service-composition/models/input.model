@@ -9,18 +9,18 @@
   <requirements cost="1" desires="//@customerDesires.3 //@customerDesires.8 //@customerDesires.13"/>
   <requirements cost="5" desires="//@customerDesires.4 //@customerDesires.9 //@customerDesires.14"/>
   <customerDesires customer="//@customers.0" requirement="//@requirements.0" importance="3"/>
-  <customerDesires customer="//@customers.0" requirement="//@requirements.1" importance="3"/>
-  <customerDesires customer="//@customers.0" requirement="//@requirements.2"/>
-  <customerDesires customer="//@customers.0" requirement="//@requirements.3" importance="2"/>
-  <customerDesires customer="//@customers.0" requirement="//@requirements.4" importance="2"/>
-  <customerDesires customer="//@customers.1" requirement="//@requirements.0" importance="2"/>
-  <customerDesires customer="//@customers.1" requirement="//@requirements.1" importance="3"/>
-  <customerDesires customer="//@customers.1" requirement="//@requirements.2" importance="9"/>
-  <customerDesires customer="//@customers.1" requirement="//@requirements.3" importance="2"/>
-  <customerDesires customer="//@customers.1" requirement="//@requirements.4" importance="8"/>
-  <customerDesires customer="//@customers.2" requirement="//@requirements.0"/>
-  <customerDesires customer="//@customers.2" requirement="//@requirements.1" importance="8"/>
-  <customerDesires customer="//@customers.2" requirement="//@requirements.2" importance="6"/>
-  <customerDesires customer="//@customers.2" requirement="//@requirements.3" importance="1"/>
-  <customerDesires customer="//@customers.2" requirement="//@requirements.4" importance="1"/>
+  <customerDesires customer="//@customers.0" requirement="//@requirements.1" importance="7"/>
+  <customerDesires customer="//@customers.0" requirement="//@requirements.2" importance="7"/>
+  <customerDesires customer="//@customers.0" requirement="//@requirements.3" importance="1"/>
+  <customerDesires customer="//@customers.0" requirement="//@requirements.4" importance="9"/>
+  <customerDesires customer="//@customers.1" requirement="//@requirements.0" importance="4"/>
+  <customerDesires customer="//@customers.1" requirement="//@requirements.1" importance="9"/>
+  <customerDesires customer="//@customers.1" requirement="//@requirements.2" importance="3"/>
+  <customerDesires customer="//@customers.1" requirement="//@requirements.3" importance="9"/>
+  <customerDesires customer="//@customers.1" requirement="//@requirements.4" importance="9"/>
+  <customerDesires customer="//@customers.2" requirement="//@requirements.0" importance="2"/>
+  <customerDesires customer="//@customers.2" requirement="//@requirements.1"/>
+  <customerDesires customer="//@customers.2" requirement="//@requirements.2" importance="4"/>
+  <customerDesires customer="//@customers.2" requirement="//@requirements.3" importance="6"/>
+  <customerDesires customer="//@customers.2" requirement="//@requirements.4" importance="2"/>
 </NextReleaseProblem:NRP>
