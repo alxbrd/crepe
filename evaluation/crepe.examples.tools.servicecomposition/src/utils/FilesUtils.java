@@ -52,7 +52,7 @@ public class FilesUtils {
 	public static String readFile(String file) throws IOException {
 		String everything = null;
 
-		BufferedReader br = new BufferedReader(new FileReader(file));
+		BufferedReader br = new BufferedReader(new FileReader(new File(file)));
 		try {
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();

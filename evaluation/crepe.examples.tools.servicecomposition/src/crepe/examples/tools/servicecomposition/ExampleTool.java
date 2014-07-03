@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import org.eclipse.emf.ecore.EObject;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
 
@@ -28,6 +30,8 @@ public class ExampleTool {
 	private String model = "LR";
 	private int objectives = 3;
 
+	private Random random = new Random();
+
 	public void setModel(String model) {
 		this.model = model;
 	}
@@ -38,20 +42,22 @@ public class ExampleTool {
 	 * @param values
 	 * @return
 	 */
-	public List<Double> evaluate(List<Integer> values) {
-		loadModel(model);
+	// public List<Double> evaluate(List<Integer> values) {
+	public double evaluate(EObject candidate) {
+//		loadModel(model);
+//
+//		// Populate the predictors of an example composition configuration
+//		PredictorsTuple pred = new PredictorsTuple(predictors, values);
+//
+//		List<Double> results = new ArrayList<Double>();
+//
+//		for (int i = 1; i <= objectives; i++) {
+//			results.add(predictData(pred, i));
+//			// System.out.println("Objective " + i + " : " + results.get(i - 1));
+//		}
 
-		// Populate the predictors of an example composition configuration
-		PredictorsTuple pred = new PredictorsTuple(predictors, values);
-
-		List<Double> results = new ArrayList<Double>();
-
-		for (int i = 1; i <= objectives; i++) {
-			results.add(predictData(pred, i));
-			// System.out.println("Objective " + i + " : " + results.get(i - 1));
-		}
-
-		return results;
+		// return results;
+		return random.nextDouble();
 	}
 
 	/**
@@ -88,6 +94,7 @@ public class ExampleTool {
 		try {
 			// Store the R model code into a temporary file
 			File tempFileR = FilesUtils.createTempFile(FilesUtils.readFile("resources/build" + modelName + ".R"));
+			// File tempFileR = FilesUtils.createTempFile(FilesUtils.readFile("resources/build" + modelName + ".R"));
 			// Store the training dataset into a temporary file too
 			String trainingSet = FilesUtils.readFile("resources/trainingSet.csv");
 			File tempFileSet = FilesUtils.createTempFile(trainingSet);
@@ -149,7 +156,8 @@ public class ExampleTool {
 		values.add(4);
 		values.add(6);
 		values.add(3);
-		ExampleTool tool = new ExampleTool();
-		tool.evaluate(values);
+//		ExampleTool tool = new ExampleTool();
+//		tool.evaluate(values);
+//		tool.shutdownR();
 	}
 }

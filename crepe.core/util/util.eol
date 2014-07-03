@@ -134,17 +134,30 @@ operation randomlyCreateIndividuals(popSize : Integer) : Sequence {
 	var minNumSegments = getConfigurationProperty("population.segments.quantity.min").asInteger();
 	var maxNumFps = getConfigurationProperty("population.segments.featurePairs.quantity.max").asInteger();
 	var minNumFps = getConfigurationProperty("population.segments.featurePairs.quantity.min").asInteger();
+	
+	var multiObjective = false;
+	if (hasConfigurationProperty("population.initialisation.multiObjective")) {
+		multiObjective = getConfigurationProperty("population.initialisation.multiObjective").asBoolean();
+	}
 				
 	// Now create random individuals
 	for (j in Sequence{1..popSize}) {
-		var individual = new SEARCH!Individual;
-		
+		var individual;
+		if (multiObjective) {
+			individual = new SEARCH!MOIndividual;
+		} else {
+			individual = new SEARCH!Individual;
+		}
 		var numSegments = random.nextInt(maxNumSegments-minNumSegments+1) + minNumSegments;
 		for (i in Sequence{1..numSegments}) { 
 			var numFps = random.nextInt(maxNumFps-minNumFps+1) + minNumFps;
 			individual.segments.add(randomlyCreateSegment(numFps, maxAllele));
 		}
-		//pop.individuals.add(individual);
+		
+		if (multiObjective) { // FIXME: I'd rather this wasn't part of an Individual, as its a global contraint on all Individuals
+			individual.isMultiObjective = true;
+		}
+		
 		inds.add(individual);
 	}
 	return inds;
@@ -191,9 +204,30 @@ operation Sequence duplicate() : Sequence {
 /**
  * 
  */
+operation SEARCH!MOIndividual duplicate() : SEARCH!MOIndividual {
+	var newIndividual = new SEARCH!MOIndividual;
+	
+	newIndividual.isMultiObjective = self.isMultiObjective;
+	newIndividual.fitness = self.fitness;
+	newIndividual.fitnessEvaluated = self.fitnessEvaluated;
+	newIndividual.rank = self.rank;
+	newIndividual.sparsity = self.sparsity;
+	
+	for (s in self.segments) {
+		newIndividual.segments.add(s.duplicate());
+	}
+	
+	return newIndividual;
+}
+
+
+/**
+ * 
+ */
 operation SEARCH!Individual duplicate() : SEARCH!Individual {
 	var newIndividual = new SEARCH!Individual;
 	
+	newIndividual.isMultiObjective = self.isMultiObjective;
 	newIndividual.fitness = self.fitness;
 	newIndividual.fitnessEvaluated = self.fitnessEvaluated;
 	

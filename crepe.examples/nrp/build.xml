@@ -4,7 +4,6 @@
 	<target name="run">
 		<!-- Load models -->	
 		<epsilon.emf.register file="metamodels/NRP.ecore"/>
-		<epsilon.emf.register file="metamodels/OrchestrationMM.ecore"/>
 		<epsilon.emf.register file="metamodels/NRPSolution.ecore"/>
 		<epsilon.emf.register file="../../crepe.core.meta/finitisation/finitisation.ecore"/>
 		<epsilon.emf.register file="../../crepe.core.meta/search/search.ecore"/>
@@ -13,7 +12,6 @@
 		
 		<epsilon.emf.loadRegisteredMetamodel name="MM" metamodeluri="NextReleaseProblemSolution"/>
 		<epsilon.emf.loadRegisteredMetamodel name="MM2" metamodeluri="NextReleaseProblem"/>
-		<epsilon.emf.loadRegisteredMetamodel name="MM3" metamodeluri="OrchestrationMM"/>
 		
 		<!-- The finitisation and input models are created by the script itself, 
 			but we still need to define a reference to the models for Epsilon to use. -->
@@ -21,15 +19,10 @@
 		    modelFile="models/fin.model"
 		    metamodelUri="http://crepe.core/meta/finitisation"
 	        read="false" store="true" />
-
+		
 		<epsilon.emf.loadModel name="NRP"
 		    modelFile="models/input.model"
 		    metamodelUri="NextReleaseProblem"
-	        read="false" store="true" />
-		
-		<epsilon.emf.loadModel name="COMP"
-		    modelFile="models/input2.model"
-		    metamodelUri="OrchestrationMM"
 	        read="false" store="true" />
 	
 		<!-- FIXME: Need to add the Properties driver to Epsilon -->
@@ -49,15 +42,6 @@
 	        read="false" store="true"/>
 		
 		<!-- Run experiment -->
-		<epsilon.eol src="createCompositioninstance.eol" taskname="COMP">
-			<model ref="COMP" /> 
-		</epsilon.eol>
-		<!--<epsilon.eol src="createCompFinitisationModel.eol" taskname="COMP">
-			<model ref="COMP" /> 
-			<model ref="MM3" />
-			<model ref="FIN" />
-		</epsilon.eol>-->
-		
 		<epsilon.eol src="createNRPinstance.eol" taskname="NRP">
 			<model ref="NRP" /> 
 		</epsilon.eol>
