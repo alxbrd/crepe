@@ -49,10 +49,23 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 
 	candidate.prettyPrint();
 
+	//for (plan in MOD!ConcretePlan.all) {
+	//	"Plan = ".println();
+	//	for (orchestrator in MOD!Orchestrator.all) {
+	//		orchestrator.println();	
+	//		var node := MOD!Node;
+	//		node = orchestrator.deployedOn;
+	//		node.println();
+	//		node.ID.asInteger().println();
+	//		node.ID.println("Orchestrator: ");
+	//	}
+	//}
+ 	//
+	
 	//var candidatePhenotype = candidate.toPhenotype();
 	//candidatePhenotype.println();
 	// Pretty print
-	//fittestPhenotype.prettyPrint();
+	//candidatePhenotype.prettyPrint();
 	
 	
 	// Maximise
@@ -73,7 +86,17 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	return Sequence{o1, o2};
 }
 
-operation CompositeApplication prettyPrint() {
-	var plans = self.concretePlans.size();
-	plans.println();
+operation MOD!CompositeApplication prettyPrint() {
+	"Solution Plan:".println();
+	var plan = MOD!ConcretePlan.all.first();
+		
+	for (orchestrator in plan.orchestrators) {
+		("Orchestrator: " + orchestrator.deployedOn.ID).println();
+		orchestrator.abstractServices.size().println("Abstract: ");
+		orchestrator.concreteServices.size().println("Concrete: ");
+		 
+		for (service in orchestrator.concreteServices) {
+			("    Concrete Services: " + service.providedBy.ID).println();
+		}
+	}
 }

@@ -10,7 +10,7 @@
 		<epsilon.emf.register file="../../crepe.core.meta/conf/configuration.ecore"/>
 		
 		<epsilon.emf.loadRegisteredMetamodel name="MM" metamodeluri="OrchestrationMM"/>
-		
+
 		<!-- The finitisation and input models are created by the script itself, 
 			but we still need to define a reference to the models for Epsilon to use. -->
 		<epsilon.emf.loadModel name="FIN"
@@ -40,15 +40,16 @@
 	        read="false" store="true"/>
 		
 		<!-- Run experiment -->
-		<epsilon.eol src="createCompositionInstance.eol">
+		<epsilon.eol src="createCompositionInstance.eol" taskname="MM">
 			<model ref="INPUT" /> 
 		</epsilon.eol>
-		<epsilon.eol src="createFinitisationModel.eol">
+		<epsilon.eol src="createFinitisationModel.eol" taskname="MM">
 			<model ref="INPUT" /> 
 			<model ref="MM" />
 			<model ref="FIN" />
 		</epsilon.eol>
-		<epsilon.eol src="serviceCompositionProblem.eol">
+		<epsilon.eol src="serviceCompositionProblem.eol" taskname="MM">
+			<model ref="INPUT" />
 			<model ref="MOD" />
 			<model ref="MM" />
 			<model ref="FIN" />

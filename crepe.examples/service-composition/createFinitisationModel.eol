@@ -28,6 +28,7 @@ fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("
 fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("Orchestrator", "deployedOn"), INPUT!Node.all));
 fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("Orchestrator", "start"), INPUT!AbstractService.all));
 fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("Orchestrator", "abstractServices"), INPUT!AbstractService.all));
+fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("Orchestrator", "concreteServices"), INPUT!ConcreteService.all));
 fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("Orchestrator", "end"), INPUT!AbstractService.all));
 
 
