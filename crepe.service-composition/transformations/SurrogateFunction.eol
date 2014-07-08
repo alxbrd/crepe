@@ -97,8 +97,8 @@ operation calculateHops(concretePlan : OrchestrationMM!ConcretePlan) : Integer {
 
   for (orchestrator in concretePlan.orchestrators) {
     for (concreteService in orchestrator.concreteServices) {
-sum = sum + lookupConnection(orchestrator.deployedOn.ID, concreteService.providedBy.ID);
-}
+		sum = sum + lookupConnection(orchestrator.deployedOn.ID, concreteService.providedBy.ID);
+	}
   }
   
   return sum;
@@ -112,15 +112,15 @@ operation countTypeNodes (type : Integer, concretePlan : OrchestrationMM!Concret
   var counter : Integer = 0;
   
   for (orchestrator in concretePlan.orchestrators) {
-if (lookupNode(orchestrator.deployedOn.ID).type == type)
-counter = counter + 1;
-
-for (concreteService in orchestrator.concreteServices) {
-var sNode = lookupNode(concreteService.providedBy.ID);
-
-if (sNode.type == type)
-counter = counter + 1;
-}
+	if (lookupNode(orchestrator.deployedOn.ID).type == type)
+	counter = counter + 1;
+	
+	for (concreteService in orchestrator.concreteServices) {
+	var sNode = lookupNode(concreteService.providedBy.ID);
+	
+	if (sNode.type == type)
+	counter = counter + 1;
+	}
   }
   
   return counter;
@@ -134,15 +134,15 @@ operation countLoadNodes (load : Integer, concretePlan : OrchestrationMM!Concret
   var counter : Integer = 0;
   
   for (orchestrator in concretePlan.orchestrators) {
-if (lookupNode(orchestrator.deployedOn.ID).load == load)
-counter = counter + 1;
-
-for (concreteService in orchestrator.concreteServices) {
-var sNode = lookupNode(concreteService.providedBy.ID);
-
-if (sNode.load == load)
-counter = counter + 1;
-}
+	if (lookupNode(orchestrator.deployedOn.ID).load == load)
+	counter = counter + 1;
+	
+	for (concreteService in orchestrator.concreteServices) {
+	var sNode = lookupNode(concreteService.providedBy.ID);
+	
+	if (sNode.load == load)
+	counter = counter + 1;
+	}
   }
   
   return counter;

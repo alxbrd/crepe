@@ -7,8 +7,6 @@
   OUT   -- instance of connectedNodes produced by the transformation
 */
 
-// Get the root element from the Predictors Metamodel
-var pred : OUT!Model := new OUT!Model;
 
 // Get the root element from the Service Composition Metamodel
 var m = new OrchestrationMM!CompositeApplication;

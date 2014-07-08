@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="ASCII"?>
 <conf:Configuration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:conf="http://crepe.core/meta/conf">
-  <properties name="termination.iterationsThreshold" value="10"/>
-  <properties name="population.size" value="10"/>
+  <properties name="termination.iterationsThreshold" value="30"/>
+  <properties name="population.size" value="96"/>
   <properties name="population.initialisation.type" value="random"/>
   <properties name="population.segments.quantity.max" value="32"/>
   <properties name="population.segments.quantity.min" value="16"/>
-  <properties name="population.segments.featurePairs.quantity.max" value="12"/>
-  <properties name="population.segments.featurePairs.quantity.min" value="8"/>
+  <properties name="population.segments.featurePairs.quantity.max" value="30"/>
+  <properties name="population.segments.featurePairs.quantity.min" value="10"/>
+  <properties name="population.parent.selectiontype" value="tournament"/>
+  <properties name="population.selection.tournamentsize" value="4"/>
   <properties name="childPopulation.size" value="18"/>	
   <properties name="childPopulation.mutation.type" value="uniform"/>
-  <properties name="childPopulation.mutation.uniform" value="0.1"/>
+  <properties name="childPopulation.mutation.uniform" value="0.05"/>
   <properties name="childPopulation.construct.probability" value="0.0"/>
   <properties name="childPopulation.destruct.probability" value="0.0"/>
   <properties name="population.initialisation.multiObjective" value="true" />

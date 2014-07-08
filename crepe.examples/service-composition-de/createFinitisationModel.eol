@@ -1,0 +1,35 @@
+/*
+	Input models: 
+		INPUT : the partial solution.
+		MM : the metamodel to finitise
+*/
+
+import "../../crepe.core/util/finitisationModelCreationUtil.eol";
+
+var fin = new FIN!MetamodelFinitisation;
+
+// Set the 'root object': the type that contains all other model objects
+fin.rootObject = MM!EClass.all.selectOne(c | c.name == "ConcretePlan");
+
+// Specify any meta-classes that should be ignored (no instances of those types will be created)
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "CompositeApplication"));
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "Node"));
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "ConcretePlan")); // Assumes only one concrete plan per individual
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "ConcreteService"));
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "AbstractPlan"));
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "AbstractService"));
+fin.ignores.add(MM!EClass.all.selectOne(c | c.name == "User"));
+fin.ignores.add(selectFeatureByName("ConcretePlan", "start"));
+fin.ignores.add(selectFeatureByName("ConcretePlan", "end"));
+fin.ignores.add(selectFeatureByName("Orchestrator", "targetOrchestrator"));
+fin.ignores.add(selectFeatureByName("Orchestrator", "start"));
+fin.ignores.add(selectFeatureByName("Orchestrator", "end"));
+
+// This isn't actually needed because we finitise it in code.
+fin.finitisations.add(createEObjectFeatureListFinitisation(selectFeatureByName("Orchestrator", "deployedOn"), INPUT!Node.all));
+
+// Scope orchestrators and plans things
+var sc = new FIN!ScopeFinitisation;
+sc.object = MM!EClass.all.selectOne(c | c.name == "Orchestrator");
+sc.max = INPUT!AbstractService.all.size();
+fin.finitisations.add(sc);

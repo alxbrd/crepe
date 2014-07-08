@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import org.eclipse.emf.ecore.EObject;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
 
@@ -30,8 +28,6 @@ public class ExampleTool {
 	private String model = "LR";
 	private int objectives = 3;
 
-	private Random random = new Random();
-
 	public void setModel(String model) {
 		this.model = model;
 	}
@@ -42,22 +38,20 @@ public class ExampleTool {
 	 * @param values
 	 * @return
 	 */
-	// public List<Double> evaluate(List<Integer> values) {
-	public double evaluate(EObject candidate) {
-//		loadModel(model);
-//
-//		// Populate the predictors of an example composition configuration
-//		PredictorsTuple pred = new PredictorsTuple(predictors, values);
-//
-//		List<Double> results = new ArrayList<Double>();
-//
-//		for (int i = 1; i <= objectives; i++) {
-//			results.add(predictData(pred, i));
-//			// System.out.println("Objective " + i + " : " + results.get(i - 1));
-//		}
+	public List<Double> evaluate(List<Integer> values) {
+		loadModel(model);
 
-		// return results;
-		return random.nextDouble();
+		// Populate the predictors of an example composition configuration
+		PredictorsTuple pred = new PredictorsTuple(predictors, values);
+
+		List<Double> results = new ArrayList<Double>();
+
+		for (int i = 1; i <= objectives; i++) {
+			results.add(predictData(pred, i));
+			// System.out.println("Objective " + i + " : " + results.get(i - 1));
+		}
+
+		return results;
 	}
 
 	/**
@@ -83,8 +77,9 @@ public class ExampleTool {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-
-		re = new Rengine(new String[] { "--vanilla" }, false, null);
+		re = Rengine.getMainEngine();
+		if (re == null)
+			re = new Rengine(new String[] { "--vanilla" }, false, null);
 
 		if (!re.waitForR()) {
 			System.out.println("Cannot load R");
@@ -156,8 +151,11 @@ public class ExampleTool {
 		values.add(4);
 		values.add(6);
 		values.add(3);
-//		ExampleTool tool = new ExampleTool();
-//		tool.evaluate(values);
-//		tool.shutdownR();
+		
+		for (int i = 0; i < 10; i++) {
+			ExampleTool tool = new ExampleTool();
+			System.out.println(tool.evaluate(values));
+		}
+		// tool.shutdownR();
 	}
 }

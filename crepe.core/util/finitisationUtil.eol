@@ -1,53 +1,53 @@
-/** 
+/**
  *
  */
 operation getRootClass() : MM!EClass {
-	return FIN!MetamodelFinitisation.all.first().rootObject;
+return FIN!MetamodelFinitisation.all.first().rootObject;
 }
 
 /**
  * Checks whether the class is allowed to be instantiated.
  * 1) Does the finitisation model say to ignore the EClass?
  * 2) Has the EClass reached its scope limit? (If one is specified)
- * 3) Is it abstract or an interface?  
+ * 3) Is it abstract or an interface?
  */
 operation MM!EClass canInstantiate() : Boolean {
-	// 1)
-	var scope = FIN!ScopeFinitisation.all.select(s | s.object = self);
-	if (scope.size() > 0) {
-		var numObjectsOfSelfType = 0;
-		for (o in modelObjects) {
-			if (o.isDefined() and o.eClass == self) numObjectsOfSelfType = numObjectsOfSelfType + 1;		
-		}
-		
-		for (s in scope) {
-			if (s.max <= numObjectsOfSelfType) {
-				return false;
-			}
-			// TODO minimum scoping (not for here, but it needs doing)
-		} 
-	}
-	
-	// 2)
-	if (self.isIgnored()) return false;
-	
-	// 3)
-	if (self.abstract or self.interface) return false;
-
-	// Otherwise, we're good
-	return true;
+// 1)
+var scope = FIN!ScopeFinitisation.all.select(s | s.object = self);
+if (scope.size() > 0) {
+var numObjectsOfSelfType = 0;
+for (o in modelObjects) {
+if (o.isDefined() and o.eClass == self) numObjectsOfSelfType = numObjectsOfSelfType + 1;
 }
 
-/** 
+for (s in scope) {
+if (s.max <= numObjectsOfSelfType) {
+return false;
+}
+// TODO minimum scoping (not for here, but it needs doing)
+}
+}
+
+// 2)
+if (self.isIgnored()) return false;
+
+// 3)
+if (self.abstract or self.interface) return false;
+
+// Otherwise, we're good
+return true;
+}
+
+/**
  * Checks whether the finitisation model specifies that the
  * EObject should be ignored.
  */
 operation MM!EObject isIgnored() : Boolean {
-	if (self.eClass.name == "EGenericType") { //// HACK! Find out why this is doing this!
-		return true;
-	}
-	if (FIN!MetamodelFinitisation.all.first().ignores.includes(self)) return true;
-	return false;
+if (self.eClass.name == "EGenericType") { //// HACK! Find out why this is doing this!
+return true;
+}
+if (FIN!MetamodelFinitisation.all.first().ignores.includes(self)) return true;
+return false;
 }
 
 /**
@@ -55,15 +55,15 @@ operation MM!EObject isIgnored() : Boolean {
  *
  */
 operation MM!EClass isAncestorIgnored() : Boolean {
-	for (super in self.eSuperTypes) {
-		if (self == super) continue; // defensive
-		if (super.isIgnored()) {
-			return true;
-		} else {
-			return super.isAncestorIgnored();
-		}
-	}
-	return false;
+for (super in self.eSuperTypes) {
+if (self == super) continue; // defensive
+if (super.isIgnored()) {
+return true;
+} else {
+return super.isAncestorIgnored();
+}
+}
+return false;
 }
 
 /**
@@ -71,76 +71,99 @@ operation MM!EClass isAncestorIgnored() : Boolean {
  * for the specified feature and checked whether the maximum has been reached.
  */
 operation isFeatureScopeReached(feature : MM!EStructuralFeature, currentSize : Integer) : Boolean {
-	var scope = FIN!ScopeFinitisation.all.select(s | s.object = feature);
-	if (scope.size() > 0) {
-		for (s in scope) {
-			if (s.max <= currentSize) {
-				return true;
-			}
-		} 
-	}
-	return false;
+var scope = FIN!ScopeFinitisation.all.select(s | s.object = feature);
+if (scope.size() > 0) {
+for (s in scope) {
+if (s.max <= currentSize) {
+return true;
+}
+}
+}
+return false;
 }
 
-/** 
+/**
  *
  */
 //operation getChoicesForFeature(eClass : MM!EClass, feature : MM!EStructuralFeature) : Sequence {
-operation getChoicesForFeature(eClass : MM!EClass, feature : MM!EStructuralFeature) : Collection {
-	var choices = new Sequence;
-	
-	if (feature.eType.getInstanceClass() == Boolean or feature.eType.getInstanceClassName() == "boolean") {
-		choices.add(true);
-		choices.add(false);
-		return choices.asSequence();
-	} else if (feature.eType.isTypeOf(MM!EEnum)) {
-		return feature.eType.eLiterals.asSequence();
-	}
-	
-	var fins = FIN!FeatureFinitisation.all.select(f|f.feature == feature and (f.parentClass == eClass or f.parentClass == null));
-	
-	// P2G fix - cannot match on the objects
-	if (fins.size() == 0) {
-		fins = FIN!FeatureFinitisation.all.select(f|f.feature.name == feature.name 
-			and f.feature.getFeatureId() == feature.getFeatureId() 
-			and (f.parentClass == null or (f.parentClass.name == eClass.name and f.parentClass.getClassifierId() == eClass.getClassifierId()))
-		);
-	}
-	
-	for (f in fins) {
-		if (f.isTypeOf(FIN!FeatureRangeFinitisation)) {
-			'FeatureRangeFinitisations are currently not supported.'.println(); // TODO
-			//choices.addAll(createRange(f.javaTypeName, f.first, f.last, f.step));
-		} else if (f.isTypeOf(FIN!FeatureListFinitisation)) {
-			choices.addAll(f.list);
-		} else if (f.isTypeOf(FIN!EObjectFeatureListFinitisation)) {
-			choices.addAll(f.list);
-		}
-	}
-	
-	for (f in FIN!DataTypeFinitisation.all) {
-		if (f.isTypeOf(FIN!DataTypeListFinitisation)) {
-			if (f.javaTypeName == feature.eType.getInstanceClassName()) {
-				choices.addAll(f.list);
-			}
-		} else if (f.isTypeOf(FIN!DataTypeRangeFinitisation)) {
-			if (f.javaTypeName == feature.eType.getInstanceClassName()) {
-				choices.addAll(createRange(f.javaTypeName, f.first, f.last, f.step));
-			}
-		}
-	}
-	
-	return choices.asSequence(); // TODO: original version adds some redundancy here.
+operation getChoicesForFeature(object : MOD!EObject, eClass : MM!EClass, feature : MM!EStructuralFeature) : Collection {
+
+// Delegate to user-defined function
+MOD.getResource.getContents().add(object); // Needed to let the user access properties on the object
+var c = getFinitisation(object, eClass, feature);
+//MOD.getResource.getContents().remove(object); // Because the object may be redundant. It would get re-added later if needed
+
+if (c <> null) {
+return c;
+}
+
+// No user defined function, so usual finitisations.
+var choices = new Sequence;
+
+// Booleans
+if (feature.eType.getInstanceClass() == Boolean or feature.eType.getInstanceClassName() == "boolean") {
+choices.add(true);
+choices.add(false);
+return choices.asSequence();
+} else if (feature.eType.isTypeOf(MM!EEnum)) { // Enums
+return feature.eType.eLiterals.asSequence();
+}
+
+// Finitisation models
+var fins = FIN!FeatureFinitisation.all.select(f|f.feature == feature and (f.parentClass == eClass or f.parentClass == null));
+
+// P2G fix - cannot match on the objects
+if (fins.size() == 0) {
+fins = FIN!FeatureFinitisation.all.select(f|f.feature.name == feature.name
+and f.feature.getFeatureId() == feature.getFeatureId()
+and (f.parentClass == null or (f.parentClass.name == eClass.name and f.parentClass.getClassifierId() == eClass.getClassifierId()))
+);
+}
+
+for (f in fins) {
+if (f.isTypeOf(FIN!FeatureRangeFinitisation)) {
+'FeatureRangeFinitisations are currently not supported.'.println(); // TODO
+//choices.addAll(createRange(f.javaTypeName, f.first, f.last, f.step));
+} else if (f.isTypeOf(FIN!FeatureListFinitisation)) {
+choices.addAll(f.list);
+} else if (f.isTypeOf(FIN!EObjectFeatureListFinitisation)) {
+choices.addAll(f.list);
+}
+}
+
+for (f in FIN!DataTypeFinitisation.all) {
+if (f.isTypeOf(FIN!DataTypeListFinitisation)) {
+if (f.javaTypeName == feature.eType.getInstanceClassName()) {
+choices.addAll(f.list);
+}
+} else if (f.isTypeOf(FIN!DataTypeRangeFinitisation)) {
+if (f.javaTypeName == feature.eType.getInstanceClassName()) {
+choices.addAll(createRange(f.javaTypeName, f.first, f.last, f.step));
+}
+}
+}
+
+return choices.asSequence(); // TODO: original version adds some redundancy here.
+}
+
+/**
+ * Empty method, to be overridden by users.
+ * @param object : the owning object.
+ * @param eClass : the owning object's eClass.
+ * @param feature : the feature to be assigned in the object.
+ */
+operation getFinitisation(object : MOD!EObject, eClass : MM!EClass, feature : MM!EStructuralFeature) : Sequence {
+return null;
 }
 
 operation createRange(type : String, first, last, step: Real): Sequence {
-	var result = new Sequence;
-	var temp = first;
-	while (temp <= last) {
-		if (type == "java.lang.Integer") result.add(temp.asInteger());
-		else if (type == "java.lang.Double") result.add(temp.asDouble());
-		else "".println();
-		temp = temp + step;
-	}
-	return result;
+var result = new Sequence;
+var temp = first;
+while (temp <= last) {
+if (type == "java.lang.Integer") result.add(temp.asInteger());
+else if (type == "java.lang.Double") result.add(temp.asDouble());
+else "".println();
+temp = temp + step;
+}
+return result;
 }

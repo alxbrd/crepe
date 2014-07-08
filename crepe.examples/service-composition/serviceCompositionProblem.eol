@@ -30,6 +30,10 @@ var maxAllele = 100;
 // Configure the amount of debug information you want to see
 var DEBUG = Sequence{"LOG"}; // Choices: LOG, WARN, DEBUG
 
+var profiler : new Native('org.eclipse.epsilon.eol.tools.ProfilerTool');
+
+profiler.start( 'Program' );
+
 // Execute the algorithm multiple times for statistical purposes
 for (i in Sequence{1..totalRuns}) {
 	run.println("Experiment Run: ");
@@ -39,6 +43,8 @@ for (i in Sequence{1..totalRuns}) {
 	t = 0; // Reset the algorithm
 }
 
+profiler.stop( );
+
 /**
 	@param candidate - a RequirementSelection object
 */
@@ -46,7 +52,8 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	// Little trick needed to make the candidate conform to the Queens MM
 	MOD.getResource.getContents().clear();
 	MOD.getResource.getContents().add(candidate);	
-
+	//MOD.store();
+	
 	candidate.prettyPrint();
 
 	//for (plan in MOD!ConcretePlan.all) {
@@ -87,16 +94,18 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 }
 
 operation MOD!CompositeApplication prettyPrint() {
-	"Solution Plan:".println();
+	"# Solution Plan:".println();
 	var plan = MOD!ConcretePlan.all.first();
 		
 	for (orchestrator in plan.orchestrators) {
-		("Orchestrator: " + orchestrator.deployedOn.ID).println();
-		orchestrator.abstractServices.size().println("Abstract: ");
-		orchestrator.concreteServices.size().println("Concrete: ");
+		("\t Orchestrator: " + orchestrator.deployedOn.ID).println();
+		
+		for (abstract in orchestrator.abstractServices) {
+			("\t\t Abstract: " + abstract.ID).println();
+		}
 		 
 		for (service in orchestrator.concreteServices) {
-			("    Concrete Services: " + service.providedBy.ID).println();
+			("\t\t\t Concrete Services: " + service.providedBy.ID).println();
 		}
 	}
 }

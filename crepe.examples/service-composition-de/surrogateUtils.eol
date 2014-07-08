@@ -1,0 +1,143 @@
+/**
+ * Calculates the predictor variable values of interest for an input service composition configuration.
+ * Returns a map containing the values of eight predictor variables.
+ */
+operation calculatePredictors(object : MOD!EObject) : Map {
+	var predictors = new Map;
+  
+	predictors.put("orchestrators", object.calculateOrhcestratos());
+  	predictors.put("hops", object.calculateHops());
+  	predictors.put("devFast", object.countTypeNodes(1));
+  	predictors.put("devMedium", object.countTypeNodes(2));
+  	predictors.put("devSlow", object.countTypeNodes(3));
+  	predictors.put("loadBig", object.countLoadNodes(1));
+  	predictors.put("loadMedium", object.countLoadNodes(2));
+  	predictors.put("loadSmall", object.countLoadNodes(3));
+
+  return predictors;
+}
+
+operation convertToArray(predictors : Map) : Sequence {
+    var values : Sequence = Sequence {
+    1, // ID - Always set to 1
+    predictors.get("orchestrators"),
+    predictors.get("hops"),
+    predictors.get("devFast"),
+    predictors.get("devMedium"),
+    predictors.get("devSlow"),
+    predictors.get("loadBig"),
+    predictors.get("loadMedium"),
+    predictors.get("loadSmall")
+    };
+    
+    return values;
+}
+
+/**
+ * Prints a pretty output for an input service composition configuration.
+ */
+operation Map prettyPrint() {
+  ("The Service Composition Configuration with: \n\t" +
+	"Orchestrators: " + self.get("orchestrators") + "\n\t" + 
+   	"Total Hops: " + self.get("hops") + "\n\t" + 
+  	"Fast Nodes: " + self.get("devFast") + "\n\t" +
+  	"Medium Nodes: " + self.get("devMedium") + "\n\t" +
+  	"Slow Nodes: " + self.get("devSlow") + "\n\t" +
+  	"Highly Loaded Nodes: " + self.get("loadBig") + "\n\t" +
+  	"Medium Loaded Nodes: " + self.get("loadMedium") + "\n\t" +
+  	"Low Loaded Nodes: " + self.get("loadSmall") + "\n\t").println();
+}
+
+/**
+ * Calculates the number of non-empty orchestrators in a concrete plan.
+ */
+operation MOD!ConcretePlan calculateOrhcestratos() : Integer {
+	var counter = 0;
+	
+	for (orchestrator in self.orchestrators) {
+  		if ( orchestrator.absConSats.size() <> 0)
+  			counter = counter + 1;
+  	}
+  
+  return counter;
+ }
+
+/**
+ * Calculates the total number of hops between the nodes within a service composition configuration.
+ * Returns the total number of hops between a pair of nodes.
+ */
+operation MOD!ConcretePlan calculateHops() : Integer {
+  var sum : Integer = 0;
+
+  	for (orchestrator in self.orchestrators) {
+		for (acs in orchestrator.absConSats) {
+				sum = sum + lookupConnection(orchestrator.deployedOn.ID, acs.concreteService.providedBy.ID);
+		}
+	}
+  
+  return sum;
+}
+
+/**
+ * Counts the various types of nodes within a service composition configuration.
+ * Returns the number of nodes with of the specific type.
+ */
+operation MOD!ConcretePlan countTypeNodes(type : Integer) : Integer {
+  	var counter : Integer = 0;
+  
+  	for (orchestrator in self.orchestrators) { 
+		if (lookupNode(orchestrator.deployedOn.ID).type == type)
+	  		counter = counter + 1;
+	  
+			for (acs in orchestrator.absConSats) {
+				var sNode = lookupNode(acs.concreteService.providedBy.ID);
+	  
+				if (sNode.type == type)
+					counter = counter + 1;
+			}
+	}
+  
+  return counter;
+}
+
+/**
+ * Counts the various types of loaded nodes within a service composition configuration.
+ * Returns the number of nodes that have the specific load.
+ */
+operation MOD!ConcretePlan countLoadNodes (load : Integer) : Integer {
+	var counter : Integer = 0;
+  
+	for (orchestrator in self.orchestrators) { 
+		if (lookupNode(orchestrator.deployedOn.ID).load == load)
+	  		counter = counter + 1;
+	  
+			for (acs in orchestrator.absConSats) {
+				var sNode = lookupNode(acs.concreteService.providedBy.ID);
+	  
+				if (sNode.load == load)
+					counter = counter + 1;
+			}
+	}
+  
+  return counter;
+}
+
+/**
+ * Finds the Node with a specific ID.
+ */
+operation lookupNode (nID : Integer) : OUT!Node {
+  return OUT!Node.all->selectOne (n | n.ID = nID);
+}
+
+/**
+ * Finds the Connection between a pair of source and target nodes.
+ */
+operation lookupConnection (nID_src : Integer, nID_tgt : Integer) : Integer {
+	if (nID_src == nID_tgt)
+    	return 0; 
+  	else {
+  		// The distance is indifferent to which of the node in the pair is identified as source or target in the connection link
+    	return (OUT!Connection.all->selectOne (con | (con.src = lookupNode(nID_src) and con.tgt = lookupNode(nID_tgt)) 
+								  or (con.src = lookupNode(nID_tgt) and con.tgt = lookupNode(nID_src)))).hops;
+  	}
+}
