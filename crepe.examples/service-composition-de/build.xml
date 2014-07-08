@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <project name="crepe.examples.tsp" basedir="." default="run">
+    <condition property="params.set">
+        <and>
+            <isset property="iteration"/>
+        </and>
+    </condition>
+    	
 	<!-- load Epsilon tasks -->
 	<path id="epsilon-classpath">
 		<fileset dir="../../crepe.dependencies/lib/">
@@ -72,6 +78,7 @@
 			<model ref="CONF" />
 			<model ref="SEARCH" />
 			<model ref="OUT" />
+			<parameter name="iteration" value="${iteration}"/>
 		</epsilon.eol>
 	</target>
 	

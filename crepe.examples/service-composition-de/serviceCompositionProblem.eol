@@ -33,7 +33,7 @@ var DEBUG = Sequence{"LOG"}; // Choices: LOG, WARN, DEBUG
 
 var javaFitnessFunction = new Native('crepe.examples.tools.servicecomposition.ExampleTool');
 javaFitnessFunction.setModel("LR");
-	
+				 
 // Execute the algorithm multiple times for statistical purposes
 for (i in Sequence{1..totalRuns}) {
 	run.println("Experiment Run: ");

@@ -65,29 +65,31 @@ operation commence() {
 	}
 	
 	// Output the Pareto approximation set into a .csv file for post-processing
-	var file := new Native("java.io.File")("../ParetoNSGAII:Iter=" + run + ".csv"); // TODO add number of current experiment
-	var fileWriter := new Native('java.io.PrintWriter')(file);
+	var numObjectives = pareto.first().objectives.size().println("# of objectives");
+	var counter = 1;
 	
-	var res = pareto.collect(ind | ind.objectives.score);
+	for (solution in pareto){
+		var file := new Native("java.io.File")("Experiments/Experiment:" + iteration.asInteger() + "/" + counter + ".csv"); // iteration.asInteger()
+		var fileWriter := new Native('java.io.PrintWriter')(file);
 	
-	var numObjectives = archive.first().objectives.size();
-	
-	var header = ""; // Header of csv file
-	for (i in Sequence{1..numObjectives - 1}) {
-		header = header + "Objective" + i +",";
-	}
-	header = header + "Objective" + numObjectives;
-
-	var tp = header + "\n"; 
-	for (r in res) {
-		for (p in Sequence{0..r.size() - 2}) {
-			tp = tp + r.at(p) + ",";
+		var header = ""; // Header of csv file
+		for (i in Sequence{1..numObjectives - 1}) {
+			header = header + "Objective" + i +",";
 		}
-		tp = tp + r.at(numObjectives - 1) + "\n"; // Print last objective without ","
+		header = header + "Objective" + numObjectives;
+	
+		var tp = header + "\n"; 
+		for (i in Sequence{0..numObjectives-2}) {
+			solution.objectives.at(i).score.println("Objective: ");
+			tp = tp + solution.objectives.at(i).score + ",";
+		}
+		tp = tp + solution.objectives.at(numObjectives - 1).score + "\n"; // Print last objective without ","
+		
+		tp.println();
+		fileWriter.println(tp);
+		fileWriter.close();
+		counter = counter + 1;
 	}
-	tp.println();
-	fileWriter.println(tp);
-	fileWriter.close();
 }
 
 operation Sequence breed(popSize : Integer) : SEARCH!Population {
