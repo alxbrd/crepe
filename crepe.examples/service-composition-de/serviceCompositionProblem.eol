@@ -16,8 +16,6 @@ import "surrogateUtils.eol";
 
 // Required utility variables
 var t = 0;
-var run = 1;
-var totalRuns = 1;
 var random = setupRandomSeed();
 var unassignedReferences;
 var modelObjects;
@@ -38,14 +36,10 @@ loadNetworkNodes();
 var javaFitnessFunction = new Native('crepe.examples.tools.servicecomposition.ExampleTool');
 javaFitnessFunction.setModel("LR");
 				 
-// Execute the algorithm multiple times for statistical purposes
-for (i in Sequence{1..totalRuns}) {
-	run.println("Experiment Run: ");
-	// Now go
-	commence();
-	run = run + 1; // Increase experiment iteration 
-	t = 0; // Reset the algorithm
-}
+iteration.println("Experiment Run: ");
+
+// Now go
+commence();
 
 /**
 	@param candidate - a RequirementSelection object
@@ -84,7 +78,7 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	}
 	
 	var predictors = calculatePredictors(candidate);
- 	predictors.prettyPrint();
+ 	//predictors.prettyPrint();
 	//candidate.prettyPrint();
 	
 	var myInts : Sequence = convertToArray(predictors);

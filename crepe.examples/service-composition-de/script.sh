@@ -3,7 +3,7 @@
 # $2 : end iteration
 
 batch=1
-proc_num=6
+proc_num=4
 counter=$1
 iterations=$(($2 / proc_num))
 
@@ -21,7 +21,7 @@ do
 		START=$(date +%s.%N)
 		mkdir "Experiments/Experiment:"$counter
   		echo ant -buildfile build.xml -Diteration=$counter &
-		#ant -buildfile build.xml -Diteration=$i &		
+		ant -buildfile build.xml -Diteration=$counter &		
 		((++executed == proc_num)) && { executed=0; wait; }
 		END=$(date +%s.%N)
 		DIFF=$(echo "$END - $START" | bc)
