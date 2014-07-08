@@ -3,8 +3,8 @@
   <properties name="termination.iterationsThreshold" value="30"/>
   <properties name="population.size" value="96"/>
   <properties name="population.initialisation.type" value="random"/>
-  <properties name="population.segments.quantity.max" value="60"/>
-  <properties name="population.segments.quantity.min" value="40"/>
+  <properties name="population.segments.quantity.max" value="30"/>
+  <properties name="population.segments.quantity.min" value="20"/>
   <properties name="population.segments.featurePairs.quantity.max" value="24"/>
   <properties name="population.segments.featurePairs.quantity.min" value="10"/>
   <properties name="population.parent.selectiontype" value="tournament"/>

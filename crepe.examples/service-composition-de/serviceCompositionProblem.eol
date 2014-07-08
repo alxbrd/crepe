@@ -80,7 +80,7 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	}
 	
 	var predictors = calculatePredictors(candidate);
- 	predictors.prettyPrint();
+ 	//predictors.prettyPrint();
 	//candidate.prettyPrint();
 	
 	var myInts : Sequence = convertToArray(predictors);

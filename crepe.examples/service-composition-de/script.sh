@@ -3,7 +3,7 @@
 # $2 : end iteration
 
 batch=1
-proc_num=3
+proc_num=4
 counter=$1
 iterations=$(($2 / proc_num))
 

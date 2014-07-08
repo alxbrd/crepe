@@ -69,7 +69,7 @@ operation commence() {
 	var counter = 1;
 	
 	for (solution in pareto){
-		var file := new Native("java.io.File")("Experiments/Experiment:" + iteration.asInteger() + "/" + counter + ".csv"); // iteration.asInteger()
+		var file := new Native("java.io.File")("Experiments/Experiment:" + iteration.asInteger() + "/" + counter); // iteration.asInteger()
 		var fileWriter := new Native('java.io.PrintWriter')(file);
 	
 		var header = ""; // Header of csv file
