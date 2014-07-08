@@ -7,6 +7,8 @@ proc_num=4
 counter=$1
 iterations=$(($2 / proc_num))
 
+export R_HOME=/usr/lib/R
+
 rm -r "Experiments/"
 mkdir "Experiments/"
 

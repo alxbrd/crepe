@@ -1,4 +1,13 @@
 /**
+  * Loads the network nodes on a memory map in order to be easily accessable by the program. 
+  */
+operation loadNetworkNodes() {
+	for (node in OUT!Node.all) { 
+		networkNodes.put(node.ID, node);
+	}
+}
+
+/**
  * Calculates the predictor variable values of interest for an input service composition configuration.
  * Returns a map containing the values of eight predictor variables.
  */
@@ -69,12 +78,18 @@ operation MOD!ConcretePlan calculateOrhcestratos() : Integer {
 operation MOD!ConcretePlan calculateHops() : Integer {
   var sum : Integer = 0;
 
+	// User sends request to first Orhcestrator
+	sum = sum + lookupConnection(1, self.orchestrators.first().deployedOn.ID);
+	
   	for (orchestrator in self.orchestrators) {
 		for (acs in orchestrator.absConSats) {
 				sum = sum + lookupConnection(orchestrator.deployedOn.ID, acs.concreteService.providedBy.ID);
 		}
 	}
   
+	// User receives request from last Orhcestrator
+	sum = sum + lookupConnection(1, self.orchestrators.last().deployedOn.ID);
+	
   return sum;
 }
 
@@ -126,7 +141,8 @@ operation MOD!ConcretePlan countLoadNodes (load : Integer) : Integer {
  * Finds the Node with a specific ID.
  */
 operation lookupNode (nID : Integer) : OUT!Node {
-  return OUT!Node.all->selectOne (n | n.ID = nID);
+	// return OUT!Node.all->selectOne (n | n.ID = nID); // Slow call
+	return networkNodes.get(nID); // Fast call
 }
 
 /**

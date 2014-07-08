@@ -31,6 +31,10 @@ var maxAllele = 100;
 // Configure the amount of debug information you want to see
 var DEBUG = Sequence{"LOG"}; // Choices: LOG, WARN, DEBUG
 
+// Create map of network nodes once
+var networkNodes : Map = new Map;
+loadNetworkNodes();
+
 var javaFitnessFunction = new Native('crepe.examples.tools.servicecomposition.ExampleTool');
 javaFitnessFunction.setModel("LR");
 				 
@@ -80,7 +84,7 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	}
 	
 	var predictors = calculatePredictors(candidate);
- 	//predictors.prettyPrint();
+ 	predictors.prettyPrint();
 	//candidate.prettyPrint();
 	
 	var myInts : Sequence = convertToArray(predictors);
