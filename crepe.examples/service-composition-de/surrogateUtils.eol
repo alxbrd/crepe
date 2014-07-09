@@ -78,10 +78,32 @@ operation MOD!ConcretePlan calculateOrhcestratos() : Integer {
 operation MOD!ConcretePlan calculateHops() : Integer {
   var sum : Integer = 0;
 
-	// User sends request to first Orhcestrator
-	sum = sum + lookupConnection(1, self.orchestrators.first().deployedOn.ID);
-	
+	if ( self.orchestrators.first().deployedOn.isDefined() )
+		// User sends request to first Orhcestrator
+		sum = sum + lookupConnection(1, self.orchestrators.first().deployedOn.ID);
+	else {
+		"Orchestrator is not deployed on a node!!!!".println();
+		// Find already assigned nodes
+		var assigned = self.orchestrators.collect(o | o.deployedOn).flatten();
+		for (node in assigned){
+			node.ID.println("Already assigned node: ");
+		}
+			
+		orchestrator.deployedOn = networkNodes.get(1);
+	}
+		
   	for (orchestrator in self.orchestrators) {
+  		if ( orchestrator.deployedOn.isUndefined() ) {
+			"Orchestrator is not deployed on a node!!!!".println();
+			// Find already assigned nodes
+			var assigned = self.orchestrators.select(o | o .deployedOn <> null ).collect(o | o.deployedOn).flatten();
+			for (node in assigned){
+				node.ID.println("Already assigned node: ");
+			}
+			
+			orchestrator.deployedOn = networkNodes.get(1);
+		}
+  		
 		for (acs in orchestrator.absConSats) {
 				sum = sum + lookupConnection(orchestrator.deployedOn.ID, acs.concreteService.providedBy.ID);
 		}
@@ -101,6 +123,18 @@ operation MOD!ConcretePlan countTypeNodes(type : Integer) : Integer {
   	var counter : Integer = 0;
   
   	for (orchestrator in self.orchestrators) { 
+  	
+  		if ( orchestrator.deployedOn.isUndefined() ) {
+			"Orchestrator is not deployed on a node!!!!".println();
+			// Find already assigned nodes
+			var assigned = self.orchestrators.select(o | o .deployedOn <> null ).collect(o | o.deployedOn).flatten();
+			for (node in assigned){
+				node.ID.println("Already assigned node: ");
+			}
+			
+			orchestrator.deployedOn = networkNodes.get(1);
+		}
+		
 		if (lookupNode(orchestrator.deployedOn.ID).type == type)
 	  		counter = counter + 1;
 	  

@@ -320,6 +320,7 @@ operation MM!EClass canIContainMyself() {
 operation setupRandomSeed() : Any {
 	if (hasConfigurationProperty("usePrngSeed") and getConfigurationProperty("usePrngSeed").asBoolean()) {
 		var seed = getConfigurationProperty("prngSeed").asLong();
+		seed.println("Seed is set to : ");
 		return new Native("java.util.Random")(seed);
 	} else { 
 		return new Native("java.util.Random");

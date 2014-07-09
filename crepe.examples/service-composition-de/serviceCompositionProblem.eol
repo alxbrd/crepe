@@ -16,6 +16,7 @@ import "surrogateUtils.eol";
 
 // Required utility variables
 var t = 0;
+var counterPareto = 1;
 var random = setupRandomSeed();
 var unassignedReferences;
 var modelObjects;
@@ -50,6 +51,7 @@ commence();
 	// 3. Potentially fix abs services (if the last Orchestrator doesn't include all remaining ASs)
 	// Remove all invalid Orchestrators / Satisfactions
 	// Update the INPUT mod for evaluation.
+
 	
 operation doEvaluateFitness(candidate:MM!EObject) : Sequence {	
 	// Clean up any invalid orchestrators/absConSats
@@ -71,7 +73,9 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	
 	// Check that all ASs are represented
 	for (abs in INPUT!AbstractService.all) {
-		var a = candidate.orchestrators.collect(o | o.absConSats).flatten().select(a | a == abs);
+		//(abs.ID).println("AS = ");
+		var a = candidate.orchestrators.collect(o | o.absConSats).flatten().select(a | a.abstractService == abs);
+		//a.println();
 		if (a.isUndefined()) {
 			("Missing concrete service for abstract service with ID = " + abs.ID).errln();
 		}
@@ -79,24 +83,87 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	
 	var predictors = calculatePredictors(candidate);
  	//predictors.prettyPrint();
-	candidate.prettyPrint();
+	//candidate.prettyPrint();
 	
 	if (candidate.~printend == true) {
 		"FINAL PRINT!!!!!!".println();
 		candidate.prettyPrint();	
-	 	for (o in candidate.orchestrators) {
-	    	o.deployedOn.ID.println("#");
-		    for (a in o.absConSats) {
-		      	a.concreteService.ID.println();
-		    }
-	  	}
-	  	"%".println();
-	  	// or call candidate.prettyPrint() here
-	} else {
-		"Normal PRINT!!!!!!".println();
-		candidate.prettyPrint();	
-	}
-	
+		
+		var maxAS = MOD!AbsConSatisfaction.all.select(a | a.abstractService <> null).collect(a | a.abstractService.ID).flatten().max();
+		//maxAS.println("maxAS = ");
+		//var maxOrch = candidate.orchestrators.collect(o | o.absConSats).flatten().select(a | a.abstractService == maxAS).first();
+	    //maxOrch.println();
+	    var maxOrch = candidate.orchestrators.sortBy(o | o.absConSats.collect(a | a.abstractService == maxAS).max()).first();
+	    maxOrch.println("tttttttttest");
+	    
+	    // Fix unassigned abstract services
+		for (abs in INPUT!AbstractService.all) {
+			(abs.ID).println("AS = ");
+			var a = candidate.orchestrators.collect(o | o.absConSats).flatten().select(a | a.abstractService == abs).first();
+			if ( a.isDefined() ) {
+				var absCon = candidate.orchestrators.collect(o | o.absConSats).first();
+				(a.concreteService.ID).println("CS = ");
+			}
+			else {
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				"Problem! choose first".println();
+				var absProblem = INPUT!AbstractService.all.selectOne(a | a.ID == abs.ID).asSequence().first();
+				absProblem.concreteServices.first().ID.println("Choose first: ");
+				
+				// Find last orchestrator to append the problematic abstract service
+				var newAS : MOD!AbsConSatisfaction = new MOD!AbsConSatisfaction;
+				newAS.orchestrator = maxOrch;
+				newAS.abstractService = a;
+				newAS.concreteService = absProblem.concreteServices.first();
+				maxOrch.absConSats.add(newAS);
+			}
+		}
+		
+	    // Print the discovered Pareto solutions into simulator-friendly format
+		var file := new Native("java.io.File")("Experiments/Experiment:" + iteration.asInteger() + "/" + counterPareto); // iteration.asInteger()
+		var fileWriter := new Native('java.io.PrintWriter')(file);
+		
+		var output;
+		var previous;
+		
+		for (orc in Sequence{1..5}){
+			var orchestrator = candidate.orchestrators.select(o | o.absConSats.select(a | a.abstractService <> null).collect(a | a.abstractService.ID).includes(orc)).first(); 
+			orchestrator.println("1orch: ");
+			
+			var services = 0;
+			
+			if ( orchestrator.isUndefined() )
+				orchestrator = maxOrch;
+				
+			if ( previous <> orchestrator and orchestrator.println("2orch: ").absConSats.isDefined()) { // Do not consider the same concrete services
+				orchestrator.println("Orchestrator = ");
+				orchestrator.deployedOn.ID.println("Orchestrator = ");
+				for (abs in orchestrator.absConSats)
+					if ( abs.concreteService.isDefined() ) {
+						output = output + abs.concreteService.ID + "\n";
+						services = services + 1;
+					}
+			}
+		    
+		    if (services > 0 and previous <> orchestrator ) { // Print only non-empty orchestrators 
+				output = output + "#" + orchestrator.deployedOn.ID + "\n";
+	    	}
+	    	
+	    	previous = orchestrator;
+		}
+		
+		output = output + "%";
+		output.println();
+		fileWriter.println(output);
+		fileWriter.close();
+		counterPareto = counterPareto + 1;
+	} 
 	
 	var myInts : Sequence = convertToArray(predictors);
 	var result : Sequence = javaFitnessFunction.evaluate(myInts);
@@ -115,10 +182,11 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	
 	// TODO: delegate to real fitness function.
 	
-  	//("Response Time: " + result.get(0)).println();
-  	//("Service Reliability: " + result.get(1)).println();
-  	//("Energy Consumption: " + result.get(2)).println();
-	
+	if (candidate.~printend == true) {
+  		("Response Time: " + result.get(0)).println();
+  		("Service Reliability: " + result.get(1)).println();
+  		("Energy Consumption: " + result.get(2)).println();
+	}
 	// Create objectives (TODO: We can make a utility method for this)
 	
 	// Response time
@@ -199,7 +267,8 @@ operation MOD!ConcretePlan prettyPrint() {
 	"Solution Plan:".println();
 	
 	for (orchestrator in self.orchestrators) {
-		("\tOrchestrator: " + orchestrator.deployedOn.ID).println();
+		if ( orchestrator.absConSats.size() > 0 ) // Print only non-empty orchestrators 
+			("\tOrchestrator: " + orchestrator.deployedOn.ID).println();
 		for (acs in orchestrator.absConSats) {
 			if (acs.abstractService.isUndefined()) {
 				"\t\tNo abstract service".errln();			

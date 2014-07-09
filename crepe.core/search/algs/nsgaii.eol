@@ -64,81 +64,12 @@ operation commence() {
 		population = archive.breed(archiveSize);
 	}
 	
-	pareto.size().println("Size of Pareto front: ");
 	for (ind in pareto) {
 		  var phenotype = ind.toPhenotype();
 		  phenotype.~printend = true; // This is an 'extended property' to tell the fit function to print
 		  doEvaluateFitness(phenotype);
+		  delete phenotype;
 	}
-
-/*	// Output the Pareto approximation set into a .csv file for post-processing
-	var numObjectives = pareto.first().objectives.size().println("# of objectives");
-	var counter = 1;
-	
-	for (solution in pareto){
-		var file := new Native("java.io.File")("Experiments/Experiment:" + iteration.asInteger() + "/" + counter); // iteration.asInteger()
-		var fileWriter := new Native('java.io.PrintWriter')(file);
-		
-		var candidate = solution.toPhenotype();
-		counter.println("Pareto solution: ");
-		for (orchestrator in candidate.orchestrators) {
-			("\tOrchestrator: " + orchestrator.deployedOn.ID).println();
-			for (acs in orchestrator.absConSats) {
-				if (acs.abstractService.isUndefined()) {
-					"\t\tNo abstract service".errln();			
-				} else {
-					acs.abstractService.ID.println("\t\tAbstract: ");
-				}
-				if (acs.concreteService.isUndefined()) {
-					"\t\tNo concrete service".errln();	
-				} else  {
-					acs.concreteService.ID.println("\t\tConcrete: ");
-				}
-			}
-		}
-		
-		// Find first Orchestrator of the composition
-		var output;
-		var previous;
-		for (orc in Sequence{1..5}){
-			var orchestrator = candidate.orchestrators.select(o | o.absConSats.select(a | a.abstractService <> null).collect(a | a.abstractService.ID).includes(orc)).first(); 
-			
-			if ( orchestrator.isDefined() )
-				orchestrator.deployedOn.ID.println("min Orchestator = ");
-			
-			if ( previous <> orchestrator ) {// Do not consider the same concrete services
-				var services = 0;
-				for (abs in orchestrator.absConSats)
-					if ( abs.concreteService.isDefined() ) {
-						abs.concreteService.ID.println("Concrete service: ");
-						output = output + abs.concreteService.ID + "\n";
-						services = services + 1;
-					}
-					else {
-						if ( abs.abstractService.isDefined()) {
-							// Choose a random service for the unassigned abstract service
-							var concrete = abs.abstractService.all.first();
-							abs.concreteService = concrete;
-							abs.concreteService.ID.println("New Concrete service: ");
-							output = output + abs.concreteService.ID + "\n";
-							services = services + 1;
-						}
-					}
-				
-				if (services > 0 ) {
-					output = output + "#" + orchestrator.deployedOn.ID + "\n";
-					previous = orchestrator;
-				}
-			}
-		}
-		
-		output = output + "%";
-		output.println();
-		fileWriter.println(output);
-		fileWriter.close();
-		
-		counter = counter + 1;
-	}*/
 }
 
 operation Sequence breed(popSize : Integer) : SEARCH!Population {
@@ -241,12 +172,16 @@ operation partitionIntoParetoFront(pop : OrderedSet, front : OrderedSet, nonFron
 			}
 			j = j + 1;
 		}
+		
 		if (noOneWasBetter) {
-			if (front.excludes(ind)) front.add(ind);
+			if (front.excludes(ind)) {
+				front.add(ind);
+			}
 		}
 	} 
 	
 	for (i in front) i.rank = rank;
+	
 	return front;
 }
 
@@ -263,6 +198,7 @@ operation partitionIntoRanks(population : Sequence) : Sequence { // of Sequences
 		partitionIntoParetoFront(workingPop, front, nonFront, rank);
 		workingPop = nonFront;
 		frontsByRank.add(front.asSequence());
+		
 		rank = rank + 1;
 	} 
 	
@@ -351,4 +287,3 @@ operation SEARCH!Population fastNonDominatedSort() : Sequence {
 	}
 	return fronts;
 }
-
