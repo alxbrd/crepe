@@ -79,7 +79,24 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	
 	var predictors = calculatePredictors(candidate);
  	//predictors.prettyPrint();
-	//candidate.prettyPrint();
+	candidate.prettyPrint();
+	
+	if (candidate.~printend == true) {
+		"FINAL PRINT!!!!!!".println();
+		candidate.prettyPrint();	
+	 	for (o in candidate.orchestrators) {
+	    	o.deployedOn.ID.println("#");
+		    for (a in o.absConSats) {
+		      	a.concreteService.ID.println();
+		    }
+	  	}
+	  	"%".println();
+	  	// or call candidate.prettyPrint() here
+	} else {
+		"Normal PRINT!!!!!!".println();
+		candidate.prettyPrint();	
+	}
+	
 	
 	var myInts : Sequence = convertToArray(predictors);
 	var result : Sequence = javaFitnessFunction.evaluate(myInts);
@@ -90,8 +107,8 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 	// All of these references will be empty at the point of evaluation.
 	// 3) In my experiments we _never_ got an invalid model. But you may need to check
 	// that all abstract services are represented.
-	// Besides that I THINK all should be working...
-
+	// Besides that I THINK all should be working... 
+ 
 	// Now copy the concretePlan into the INPUT model for evaluation
 	INPUT!CompositeApplication.all.first().concretePlans.clear();
 	INPUT!CompositeApplication.all.first().concretePlans.add(candidate);

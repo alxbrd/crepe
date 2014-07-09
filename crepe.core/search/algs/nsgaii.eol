@@ -64,7 +64,14 @@ operation commence() {
 		population = archive.breed(archiveSize);
 	}
 	
-	// Output the Pareto approximation set into a .csv file for post-processing
+	pareto.size().println("Size of Pareto front: ");
+	for (ind in pareto) {
+		  var phenotype = ind.toPhenotype();
+		  phenotype.~printend = true; // This is an 'extended property' to tell the fit function to print
+		  doEvaluateFitness(phenotype);
+	}
+
+/*	// Output the Pareto approximation set into a .csv file for post-processing
 	var numObjectives = pareto.first().objectives.size().println("# of objectives");
 	var counter = 1;
 	
@@ -131,7 +138,7 @@ operation commence() {
 		fileWriter.close();
 		
 		counter = counter + 1;
-	}
+	}*/
 }
 
 operation Sequence breed(popSize : Integer) : SEARCH!Population {
