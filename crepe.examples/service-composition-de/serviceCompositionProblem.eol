@@ -81,6 +81,16 @@ operation doEvaluateFitness(candidate:MM!EObject) : Sequence {
 		}
 	}
 	
+	// Heuristic - assign orchestrators to nodes within the same sub-orchestration
+	// Check online non empty and already assigned orchestrators
+	for (node in candidate.orchestrators.select(o | o.deployedOn <> null and o.absConSats.size() > 0).collect(n | n.deployedOn)) {
+       	// Find orchestrated nodes in the sub-orchestration
+       	var candidateNodes = MOD!AbsConSatisfaction.all.select(a | a.orchestrator.deployedOn == node).collect(a | a.concreteService).flatten();
+  		
+  		var orchestrator = candidate.orchestrators.select(o | o.deployedOn == node).first();
+  		orchestrator.deployedOn = candidateNodes.random();
+	}
+	
 	var predictors = calculatePredictors(candidate);
  	//predictors.prettyPrint();
 	//candidate.prettyPrint();
