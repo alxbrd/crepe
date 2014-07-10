@@ -1,10 +1,12 @@
+
+
 /**
-  * Loads the network nodes on a memory map in order to be easily accessable by the program. 
+  * Loads the network nodes on a memory map in order to be easily accessable by the program.
   */
 operation loadNetworkNodes() {
-	for (node in OUT!Node.all) { 
-		networkNodes.put(node.ID, node);
-	}
+    for (node in OUT!Node.all) {
+        networkNodes.put(node.ID, node);
+    }
 }
 
 /**
@@ -12,16 +14,16 @@ operation loadNetworkNodes() {
  * Returns a map containing the values of eight predictor variables.
  */
 operation calculatePredictors(object : MOD!EObject) : Map {
-	var predictors = new Map;
-  
-	predictors.put("orchestrators", object.calculateOrhcestratos());
-  	predictors.put("hops", object.calculateHops());
-  	predictors.put("devFast", object.countTypeNodes(1));
-  	predictors.put("devMedium", object.countTypeNodes(2));
-  	predictors.put("devSlow", object.countTypeNodes(3));
-  	predictors.put("loadBig", object.countLoadNodes(1));
-  	predictors.put("loadMedium", object.countLoadNodes(2));
-  	predictors.put("loadSmall", object.countLoadNodes(3));
+    var predictors = new Map;
+ 
+    predictors.put("orchestrators", object.calculateOrhcestratos());
+      predictors.put("hops", object.calculateHops());
+      predictors.put("devFast", object.countTypeNodes(1));
+      predictors.put("devMedium", object.countTypeNodes(2));
+      predictors.put("devSlow", object.countTypeNodes(3));
+      predictors.put("loadBig", object.countLoadNodes(1));
+      predictors.put("loadMedium", object.countLoadNodes(2));
+      predictors.put("loadSmall", object.countLoadNodes(3));
 
   return predictors;
 }
@@ -38,7 +40,7 @@ operation convertToArray(predictors : Map) : Sequence {
     predictors.get("loadMedium"),
     predictors.get("loadSmall")
     };
-    
+   
     return values;
 }
 
@@ -47,27 +49,27 @@ operation convertToArray(predictors : Map) : Sequence {
  */
 operation Map prettyPrint() {
   ("The Service Composition Configuration with: \n\t" +
-	"Orchestrators: " + self.get("orchestrators") + "\n\t" + 
-   	"Total Hops: " + self.get("hops") + "\n\t" + 
-  	"Fast Nodes: " + self.get("devFast") + "\n\t" +
-  	"Medium Nodes: " + self.get("devMedium") + "\n\t" +
-  	"Slow Nodes: " + self.get("devSlow") + "\n\t" +
-  	"Highly Loaded Nodes: " + self.get("loadBig") + "\n\t" +
-  	"Medium Loaded Nodes: " + self.get("loadMedium") + "\n\t" +
-  	"Low Loaded Nodes: " + self.get("loadSmall") + "\n\t").println();
+    "Orchestrators: " + self.get("orchestrators") + "\n\t" +
+       "Total Hops: " + self.get("hops") + "\n\t" +
+      "Fast Nodes: " + self.get("devFast") + "\n\t" +
+      "Medium Nodes: " + self.get("devMedium") + "\n\t" +
+      "Slow Nodes: " + self.get("devSlow") + "\n\t" +
+      "Highly Loaded Nodes: " + self.get("loadBig") + "\n\t" +
+      "Medium Loaded Nodes: " + self.get("loadMedium") + "\n\t" +
+      "Low Loaded Nodes: " + self.get("loadSmall") + "\n\t").println();
 }
 
 /**
  * Calculates the number of non-empty orchestrators in a concrete plan.
  */
 operation MOD!ConcretePlan calculateOrhcestratos() : Integer {
-	var counter = 0;
-	
-	for (orchestrator in self.orchestrators) {
-  		if ( orchestrator.absConSats.size() <> 0)
-  			counter = counter + 1;
-  	}
-  
+    var counter = 0;
+   
+    for (orchestrator in self.orchestrators) {
+          if ( orchestrator.absConSats.size() <> 0)
+              counter = counter + 1;
+      }
+ 
   return counter;
  }
 
@@ -78,40 +80,41 @@ operation MOD!ConcretePlan calculateOrhcestratos() : Integer {
 operation MOD!ConcretePlan calculateHops() : Integer {
   var sum : Integer = 0;
 
-	if ( self.orchestrators.first().deployedOn.isDefined() )
-		// User sends request to first Orhcestrator
-		sum = sum + lookupConnection(1, self.orchestrators.first().deployedOn.ID);
-	else {
-		"Orchestrator is not deployed on a node!!!!".println();
-		// Find already assigned nodes
-		var assigned = self.orchestrators.collect(o | o.deployedOn).flatten();
-		for (node in assigned){
-			node.ID.println("Already assigned node: ");
-		}
-			
-		orchestrator.deployedOn = networkNodes.get(1);
-	}
-		
-  	for (orchestrator in self.orchestrators) {
-  		if ( orchestrator.deployedOn.isUndefined() ) {
-			"Orchestrator is not deployed on a node!!!!".println();
-			// Find already assigned nodes
-			var assigned = self.orchestrators.select(o | o .deployedOn <> null ).collect(o | o.deployedOn).flatten();
-			for (node in assigned){
-				node.ID.println("Already assigned node: ");
-			}
-			
-			orchestrator.deployedOn = networkNodes.get(1);
-		}
-  		
-		for (acs in orchestrator.absConSats) {
-				sum = sum + lookupConnection(orchestrator.deployedOn.ID, acs.concreteService.providedBy.ID);
-		}
-	}
-  
-	// User receives request from last Orhcestrator
-	sum = sum + lookupConnection(1, self.orchestrators.last().deployedOn.ID);
-	
+    if ( self.orchestrators.first().deployedOn.isDefined() )
+        // User sends request to first Orhcestrator
+        sum = sum + lookupConnection(1, self.orchestrators.first().deployedOn.ID);
+    else {
+        "Orchestrator is not deployed on a node!!!!".println();
+        // Find already assigned nodes
+        var assigned = self.orchestrators.collect(o | o.deployedOn).flatten();
+        for (node in assigned){
+            if ( node.isDefined() )
+                node.ID.println("Already assigned node: ");
+        }
+           
+        self.orchestrators.first().deployedOn = networkNodes.get(1);
+    }
+       
+      for (orchestrator in self.orchestrators) {
+          if ( orchestrator.deployedOn.isUndefined() ) {
+            "Orchestrator is not deployed on a node!!!!".println();
+            // Find already assigned nodes
+            var assigned = self.orchestrators.select(o | o .deployedOn <> null ).collect(o | o.deployedOn).flatten();
+            for (node in assigned){
+                node.ID.println("Already assigned node: ");
+            }
+           
+            orchestrator.deployedOn = networkNodes.get(1);
+        }
+         
+        for (acs in orchestrator.absConSats) {
+                sum = sum + lookupConnection(orchestrator.deployedOn.ID, acs.concreteService.providedBy.ID);
+        }
+    }
+ 
+    // User receives request from last Orhcestrator
+    sum = sum + lookupConnection(1, self.orchestrators.last().deployedOn.ID);
+   
   return sum;
 }
 
@@ -120,32 +123,32 @@ operation MOD!ConcretePlan calculateHops() : Integer {
  * Returns the number of nodes with of the specific type.
  */
 operation MOD!ConcretePlan countTypeNodes(type : Integer) : Integer {
-  	var counter : Integer = 0;
-  
-  	for (orchestrator in self.orchestrators) { 
-  	
-  		if ( orchestrator.deployedOn.isUndefined() ) {
-			"Orchestrator is not deployed on a node!!!!".println();
-			// Find already assigned nodes
-			var assigned = self.orchestrators.select(o | o .deployedOn <> null ).collect(o | o.deployedOn).flatten();
-			for (node in assigned){
-				node.ID.println("Already assigned node: ");
-			}
-			
-			orchestrator.deployedOn = networkNodes.get(1);
-		}
-		
-		if (lookupNode(orchestrator.deployedOn.ID).type == type)
-	  		counter = counter + 1;
-	  
-			for (acs in orchestrator.absConSats) {
-				var sNode = lookupNode(acs.concreteService.providedBy.ID);
-	  
-				if (sNode.type == type)
-					counter = counter + 1;
-			}
-	}
-  
+      var counter : Integer = 0;
+ 
+      for (orchestrator in self.orchestrators) {
+     
+          if ( orchestrator.deployedOn.isUndefined() ) {
+            "Orchestrator is not deployed on a node!!!!".println();
+            // Find already assigned nodes
+            var assigned = self.orchestrators.select(o | o .deployedOn <> null ).collect(o | o.deployedOn).flatten();
+            for (node in assigned){
+                node.ID.println("Already assigned node: ");
+            }
+           
+            orchestrator.deployedOn = networkNodes.get(1);
+        }
+       
+        if (lookupNode(orchestrator.deployedOn.ID).type == type)
+              counter = counter + 1;
+     
+            for (acs in orchestrator.absConSats) {
+                var sNode = lookupNode(acs.concreteService.providedBy.ID);
+     
+                if (sNode.type == type)
+                    counter = counter + 1;
+            }
+    }
+ 
   return counter;
 }
 
@@ -154,20 +157,20 @@ operation MOD!ConcretePlan countTypeNodes(type : Integer) : Integer {
  * Returns the number of nodes that have the specific load.
  */
 operation MOD!ConcretePlan countLoadNodes (load : Integer) : Integer {
-	var counter : Integer = 0;
-  
-	for (orchestrator in self.orchestrators) { 
-		if (lookupNode(orchestrator.deployedOn.ID).load == load)
-	  		counter = counter + 1;
-	  
-			for (acs in orchestrator.absConSats) {
-				var sNode = lookupNode(acs.concreteService.providedBy.ID);
-	  
-				if (sNode.load == load)
-					counter = counter + 1;
-			}
-	}
-  
+    var counter : Integer = 0;
+ 
+    for (orchestrator in self.orchestrators) {
+        if (lookupNode(orchestrator.deployedOn.ID).load == load)
+              counter = counter + 1;
+     
+            for (acs in orchestrator.absConSats) {
+                var sNode = lookupNode(acs.concreteService.providedBy.ID);
+     
+                if (sNode.load == load)
+                    counter = counter + 1;
+            }
+    }
+ 
   return counter;
 }
 
@@ -175,19 +178,19 @@ operation MOD!ConcretePlan countLoadNodes (load : Integer) : Integer {
  * Finds the Node with a specific ID.
  */
 operation lookupNode (nID : Integer) : OUT!Node {
-	// return OUT!Node.all->selectOne (n | n.ID = nID); // Slow call
-	return networkNodes.get(nID); // Fast call
+    // return OUT!Node.all->selectOne (n | n.ID = nID); // Slow call
+    return networkNodes.get(nID); // Fast call
 }
 
 /**
  * Finds the Connection between a pair of source and target nodes.
  */
 operation lookupConnection (nID_src : Integer, nID_tgt : Integer) : Integer {
-	if (nID_src == nID_tgt)
-    	return 0; 
-  	else {
-  		// The distance is indifferent to which of the node in the pair is identified as source or target in the connection link
-    	return (OUT!Connection.all->selectOne (con | (con.src = lookupNode(nID_src) and con.tgt = lookupNode(nID_tgt)) 
-								  or (con.src = lookupNode(nID_tgt) and con.tgt = lookupNode(nID_src)))).hops;
-  	}
+    if (nID_src == nID_tgt)
+        return 0;
+      else {
+          // The distance is indifferent to which of the node in the pair is identified as source or target in the connection link
+        return (OUT!Connection.all->selectOne (con | (con.src = lookupNode(nID_src) and con.tgt = lookupNode(nID_tgt))
+                                  or (con.src = lookupNode(nID_tgt) and con.tgt = lookupNode(nID_src)))).hops;
+      }
 }
